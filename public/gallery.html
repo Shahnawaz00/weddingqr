@@ -3,9 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#0e3b2a" />
+  <meta name="theme-color" content="#163b2e" />
   <title>Gallery</title>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="/style.css" />
   <script src="/config.js"></script>
   <script src="/theme.js"></script>
@@ -19,12 +20,7 @@
     </div>
 
     <div class="rule-diamond" aria-hidden="true">
-      <svg viewBox="0 0 280 16" xmlns="http://www.w3.org/2000/svg">
-        <line x1="6" y1="8" x2="124" y2="8" stroke="currentColor" stroke-width="0.6"/>
-        <path d="M140 1.5 L147.5 8 L140 14.5 L132.5 8 Z" fill="none" stroke="currentColor" stroke-width="0.7"/>
-        <path d="M140 4.4 L143.8 8 L140 11.6 L136.2 8 Z" fill="currentColor"/>
-        <line x1="156" y1="8" x2="274" y2="8" stroke="currentColor" stroke-width="0.6"/>
-      </svg>
+      <span class="ornament"></span>
     </div>
 
     <p class="eyebrow">A collection of your moments</p>
@@ -42,9 +38,15 @@
     </div>
 
     <div class="btn-row">
-      <a class="btn btn-primary" href="/upload.html">Add more photos</a>
+      <a class="btn btn-primary" href="/upload.html">Add a moment</a>
       <a class="link-elegant" href="/">← Home</a>
     </div>
+  </div>
+
+  <!-- In-page lightbox: thumb morphs into hero via shared view-transition-name -->
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Photo viewer">
+    <button class="lb-close" id="lbClose" type="button" aria-label="Close">×</button>
+    <div id="lbContent"></div>
   </div>
 
   <script>
@@ -55,9 +57,55 @@
 
     const gallery = document.getElementById('gallery');
     const filtersEl = document.getElementById('filters');
+    const lightbox = document.getElementById('lightbox');
+    const lbContent = document.getElementById('lbContent');
+    const lbClose = document.getElementById('lbClose');
     const events = Array.isArray(c.events) ? c.events : [];
     let allPhotos = [];
     let active = 'all';
+
+    // Stable id from URL so the same thumb gets the same view-transition-name across renders
+    function vtNameFor(p) {
+      const base = (p.url || p.key || '').replace(/[^a-zA-Z0-9]/g, '_');
+      return `photo_${base.slice(-40)}`;
+    }
+
+    function openLightbox(photo, sourceEl) {
+      const sourceVtName = sourceEl.style.viewTransitionName;
+
+      const show = () => {
+        lbContent.innerHTML = '';
+        const el = photo.isVideo
+          ? Object.assign(document.createElement('video'), { src: photo.url, controls: true, autoplay: true, playsInline: true })
+          : Object.assign(document.createElement('img'), { src: photo.url, alt: '' });
+        if (sourceVtName) el.style.viewTransitionName = sourceVtName;
+        lbContent.appendChild(el);
+        lightbox.classList.add('is-open');
+      };
+
+      if (document.startViewTransition && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        document.startViewTransition(show);
+      } else {
+        show();
+      }
+    }
+
+    function closeLightbox() {
+      const el = lbContent.firstElementChild;
+      const close = () => {
+        lightbox.classList.remove('is-open');
+        lbContent.innerHTML = '';
+      };
+      if (el && document.startViewTransition && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        document.startViewTransition(close);
+      } else {
+        close();
+      }
+    }
+
+    lbClose.addEventListener('click', closeLightbox);
+    lightbox.addEventListener('click', (e) => { if (e.target === lightbox) closeLightbox(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && lightbox.classList.contains('is-open')) closeLightbox(); });
 
     function render() {
       gallery.innerHTML = '';
@@ -68,18 +116,11 @@
       if (visible.length === 0) {
         const empty = document.createElement('div');
         empty.className = 'empty';
-        empty.innerHTML = active === 'all'
-          ? `No moments yet.
-             <div class="rule-diamond" aria-hidden="true">
-               <svg viewBox="0 0 220 14" xmlns="http://www.w3.org/2000/svg">
-                 <line x1="6" y1="7" x2="98" y2="7" stroke="currentColor" stroke-width="0.6"/>
-                 <path d="M110 1.5 L116.5 7 L110 12.5 L103.5 7 Z" fill="none" stroke="currentColor" stroke-width="0.7"/>
-                 <path d="M110 4 L113.2 7 L110 10 L106.8 7 Z" fill="currentColor"/>
-                 <line x1="122" y1="7" x2="214" y2="7" stroke="currentColor" stroke-width="0.6"/>
-               </svg>
-             </div>
-             Be the first to share.`
-          : `No moments in this album yet.`;
+        if (active === 'all') {
+          empty.textContent = 'No moments yet — be the first to share.';
+        } else {
+          empty.textContent = 'No moments in this album yet.';
+        }
         gallery.appendChild(empty);
         return;
       }
@@ -87,6 +128,12 @@
       visible.forEach((p) => {
         const a = document.createElement('a');
         a.href = p.url; a.target = '_blank'; a.rel = 'noopener';
+        a.style.viewTransitionName = vtNameFor(p);
+        a.addEventListener('click', (e) => {
+          // Lightbox in-page; bypass new tab
+          e.preventDefault();
+          openLightbox(p, a);
+        });
         if (p.isVideo) {
           const v = document.createElement('video');
           v.src = p.url; v.muted = true; v.playsInline = true; v.preload = 'metadata';

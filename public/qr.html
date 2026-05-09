@@ -3,9 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#0e3b2a" />
+  <meta name="theme-color" content="#163b2e" />
   <title>Scan to share</title>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="/style.css" />
   <script src="/config.js"></script>
   <script src="/hijri.js"></script>
@@ -22,23 +23,12 @@
         <span class="cropmark bl" aria-hidden="true"></span>
         <span class="cropmark br" aria-hidden="true"></span>
 
-        <p class="bismillah" lang="ar" dir="rtl">بِسْمِ ٱللَّٰهِ</p>
+        <p class="bismillah" lang="ar" dir="rtl">بِسْمِ ٱللَّٰهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ</p>
 
         <h2><span id="brideName">—</span><span class="ampersand">&amp;</span><span id="groomName">—</span></h2>
 
-        <!-- Leafed diamond divider — alternate ornate motif used on QR card -->
         <div class="rule-diamond" aria-hidden="true" style="margin: 1.4rem 0 0.4rem;">
-          <svg viewBox="0 0 240 16" xmlns="http://www.w3.org/2000/svg">
-            <line x1="6" y1="8" x2="86" y2="8" stroke="currentColor" stroke-width="0.6"/>
-            <!-- left leaf -->
-            <path d="M92 8 Q 96 4 100 8 Q 96 12 92 8 Z" fill="currentColor" opacity="0.7"/>
-            <!-- diamond outline + inner fill -->
-            <path d="M120 1.2 L127 8 L120 14.8 L113 8 Z" fill="none" stroke="currentColor" stroke-width="0.7"/>
-            <path d="M120 4 L123.2 8 L120 12 L116.8 8 Z" fill="currentColor"/>
-            <!-- right leaf -->
-            <path d="M140 8 Q 144 4 148 8 Q 144 12 140 8 Z" fill="currentColor" opacity="0.7"/>
-            <line x1="154" y1="8" x2="234" y2="8" stroke="currentColor" stroke-width="0.6"/>
-          </svg>
+          <span class="ornament"></span>
         </div>
 
         <p class="scan-prompt" id="prompt">Scan to share your moments</p>
@@ -88,7 +78,7 @@
 
     // Read theme's primary ink colour so the QR matches whichever theme is active.
     const themeDark = getComputedStyle(document.documentElement)
-      .getPropertyValue('--emerald').trim() || '#0e3b2a';
+      .getPropertyValue('--primary').trim() || '#163b2e';
 
     new QRCode(document.getElementById('qrcode'), {
       text: uploadUrl,

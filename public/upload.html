@@ -3,9 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#0e3b2a" />
-  <title>Share photos</title>
+  <meta name="theme-color" content="#163b2e" />
+  <title>Add a moment</title>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="/style.css" />
   <script src="/config.js"></script>
   <script src="/theme.js"></script>
@@ -19,21 +20,17 @@
     </div>
 
     <div class="rule-diamond" aria-hidden="true">
-      <svg viewBox="0 0 280 16" xmlns="http://www.w3.org/2000/svg">
-        <line x1="6" y1="8" x2="124" y2="8" stroke="currentColor" stroke-width="0.6"/>
-        <path d="M140 1.5 L147.5 8 L140 14.5 L132.5 8 Z" fill="none" stroke="currentColor" stroke-width="0.7"/>
-        <path d="M140 4.4 L143.8 8 L140 11.6 L136.2 8 Z" fill="currentColor"/>
-        <line x1="156" y1="8" x2="274" y2="8" stroke="currentColor" stroke-width="0.6"/>
-      </svg>
+      <span class="ornament"></span>
     </div>
 
     <p class="italic-prompt" id="prompt">—</p>
 
-    <div class="card">
+    <div class="card" id="uploadCard">
       <label class="dropzone" id="dropzone" for="fileInput">
         <img class="dz-art" src="/dropzone-art.svg" alt="" aria-hidden="true" />
-        <p class="dz-title">Choose photos &amp; videos</p>
-        <p class="dz-sub">tap, or drag &amp; drop here</p>
+        <p class="dz-title">Add to the album</p>
+        <p class="dz-sub dz-sub-touch">a photo, a video, a blurry one — all welcome</p>
+        <p class="dz-sub dz-sub-pointer">a photo, a video, a blurry one — all welcome · or drag &amp; drop here</p>
         <input id="fileInput" type="file" accept="image/*,video/*" multiple />
       </label>
 
@@ -42,7 +39,7 @@
         <div class="event-picker" id="eventPicker"></div>
       </div>
 
-      <div class="field">
+      <div class="field" id="senderField">
         <label for="sender">Your name (optional)</label>
         <input id="sender" type="text" maxlength="24" autocomplete="name" placeholder="e.g. Aunty Sara" />
       </div>
@@ -53,8 +50,22 @@
       <p id="status" role="status"></p>
 
       <div class="btn-row desktop-only-cta">
-        <button class="btn btn-primary" id="uploadBtnDesktop" disabled>Upload</button>
+        <button class="btn btn-primary" id="uploadBtnDesktop" disabled>Send these home</button>
         <a class="link-elegant" href="/gallery.html">View the gallery →</a>
+      </div>
+
+      <div class="btn-row" id="retryRow" style="display:none;">
+        <button class="btn btn-primary" id="retryBtn" type="button">Try again</button>
+      </div>
+    </div>
+
+    <!-- Ceremony moment — replaces the card on success -->
+    <div class="ceremony" id="ceremony" aria-live="polite">
+      <span class="bismillah-star" aria-hidden="true"></span>
+      <p class="ceremony-msg" id="ceremonyMsg">Terima kasih — your moment is with us.</p>
+      <div class="btn-row ceremony-sub">
+        <a class="btn btn-primary" href="/gallery.html">View what's been shared</a>
+        <button class="link-elegant" type="button" id="addMoreBtn">Add another →</button>
       </div>
     </div>
 
@@ -63,9 +74,9 @@
     </div>
   </div>
 
-  <!-- Sticky bottom CTA — mobile only (hidden on desktop via CSS) -->
-  <div class="sticky-cta">
-    <button class="btn btn-primary" id="uploadBtn" disabled>Upload</button>
+  <!-- Sticky bottom CTA — slides in once files are selected (mobile) -->
+  <div class="sticky-cta" id="stickyCta">
+    <button class="btn btn-primary" id="uploadBtn" disabled>Send these home</button>
   </div>
 
   <script>
@@ -73,23 +84,17 @@
     document.getElementById('brideTop').textContent = c.brideName || '';
     document.getElementById('groomTop').textContent = c.groomName || '';
     document.getElementById('prompt').textContent = c.uploadPrompt || '';
-    document.title = `Share photos — ${c.brideName} & ${c.groomName}`;
+    document.title = `Add a moment — ${c.brideName} & ${c.groomName}`;
 
     // ── Chip ornaments per event slug ──────────────────────
-    // Each is a tiny inline SVG, 14×14, single gold stroke.
     const ORNAMENTS = {
-      // Henna leaf — Berinai
       'berinai': '<svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="0.85" stroke-linecap="round" stroke-linejoin="round"><path d="M7 12.5 Q 3.6 9 3.6 6 Q 3.6 2.6 7 1.5 Q 10.4 2.6 10.4 6 Q 10.4 9 7 12.5 Z"/><line x1="7" y1="2" x2="7" y2="12" opacity="0.45"/></svg>',
-      // Two interlocking rings — Akad Nikah
       'akad-nikah': '<svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="0.95"><circle cx="5" cy="7" r="2.9"/><circle cx="9" cy="7" r="2.9"/></svg>',
-      // Throne / dais — Bersanding (small arch with seat)
       'bersanding': '<svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="0.85" stroke-linecap="round" stroke-linejoin="round"><path d="M2.4 11 L 2.4 5.4 Q 2.4 3.2 4.6 3.2 L 9.4 3.2 Q 11.6 3.2 11.6 5.4 L 11.6 11"/><line x1="1.5" y1="11.4" x2="12.5" y2="11.4"/><line x1="2.4" y1="7.4" x2="11.6" y2="7.4"/></svg>',
-      // Small fleuron — Lain-lain (default)
       'lain-lain': '<svg viewBox="0 0 14 14" fill="currentColor"><ellipse cx="7" cy="3.4" rx="0.95" ry="2.2"/><ellipse cx="7" cy="10.6" rx="0.95" ry="2.2"/><ellipse cx="3.4" cy="7" rx="2.2" ry="0.95"/><ellipse cx="10.6" cy="7" rx="2.2" ry="0.95"/><circle cx="7" cy="7" r="0.9"/></svg>',
     };
     const DEFAULT_ORNAMENT = ORNAMENTS['lain-lain'];
 
-    // Render event picker if events are configured
     const events = Array.isArray(c.events) ? c.events : [];
     if (events.length > 0) {
       const picker = document.getElementById('eventPicker');
@@ -126,8 +131,19 @@
     const statusEl   = document.getElementById('status');
     const progress   = document.getElementById('progress');
     const progressBar= document.getElementById('progressBar');
+    const stickyCta  = document.getElementById('stickyCta');
+    const uploadCard = document.getElementById('uploadCard');
+    const ceremony   = document.getElementById('ceremony');
+    const retryRow   = document.getElementById('retryRow');
+    const retryBtn   = document.getElementById('retryBtn');
+    const addMoreBtn = document.getElementById('addMoreBtn');
 
     let selected = [];
+    let lastError = null;
+
+    // Auto-fill sender from previous visit
+    const savedName = localStorage.getItem('izzywedding-sender');
+    if (savedName) senderEl.value = savedName;
 
     function setStatus(msg, isError = false) {
       statusEl.textContent = msg || '';
@@ -136,6 +152,7 @@
     function setBtnDisabled(disabled) {
       uploadBtn.disabled = disabled;
       uploadBtnD.disabled = disabled;
+      stickyCta.classList.toggle('is-visible', !disabled || progress.classList.contains('is-active'));
     }
 
     function renderThumbs() {
@@ -158,7 +175,10 @@
         }
         fileList.appendChild(thumb);
       });
-      setBtnDisabled(selected.length === 0);
+      const empty = selected.length === 0;
+      uploadBtn.disabled = empty;
+      uploadBtnD.disabled = empty;
+      stickyCta.classList.toggle('is-visible', !empty);
     }
 
     function addFiles(files) {
@@ -168,6 +188,7 @@
       selected = selected.concat(arr).slice(0, 30);
       renderThumbs();
       if (arr.length) setStatus(`${selected.length} ${selected.length === 1 ? 'moment' : 'moments'} ready to share.`);
+      retryRow.style.display = 'none';
     }
 
     fileInput.addEventListener('change', (e) => addFiles(e.target.files));
@@ -188,15 +209,49 @@
       if (e.dataTransfer && e.dataTransfer.files) addFiles(e.dataTransfer.files);
     });
 
+    function showCeremony(count) {
+      const msg = count === 1
+        ? 'Terima kasih — your moment is with us.'
+        : `Terima kasih — your ${count} moments are with us.`;
+      document.getElementById('ceremonyMsg').textContent = msg;
+      // Crossfade card → ceremony
+      uploadCard.style.display = 'none';
+      stickyCta.classList.remove('is-visible');
+      ceremony.classList.add('is-active');
+      // Quiet haptic acknowledgement
+      try { navigator.vibrate && navigator.vibrate([8, 40, 12]); } catch {}
+      // Smooth scroll to top so the moment is fully visible
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function resetForAnother() {
+      ceremony.classList.remove('is-active');
+      uploadCard.style.display = '';
+      selected = [];
+      renderThumbs();
+      setStatus('');
+      progress.classList.remove('is-active', 'is-indeterminate');
+      progressBar.style.width = '0%';
+    }
+
+    addMoreBtn.addEventListener('click', resetForAnother);
+    retryBtn.addEventListener('click', () => doUpload());
+
     function doUpload() {
       if (!selected.length) return;
-      setBtnDisabled(true);
+      retryRow.style.display = 'none';
+      lastError = null;
+      uploadBtn.disabled = true;
+      uploadBtnD.disabled = true;
       progress.classList.add('is-active');
       progressBar.style.width = '0%';
-      setStatus('Uploading…');
+      setStatus('Sending…');
+
+      // Persist sender for next visit
+      const sender = senderEl.value.trim();
+      if (sender) localStorage.setItem('izzywedding-sender', sender);
 
       const fd = new FormData();
-      const sender = senderEl.value.trim();
       if (sender) fd.append('sender', sender);
       fd.append('event', getSelectedEvent());
       selected.forEach((f) => fd.append('files', f, f.name));
@@ -205,27 +260,38 @@
       xhr.open('POST', '/api/upload');
       xhr.upload.onprogress = (e) => {
         if (e.lengthComputable) {
+          progress.classList.remove('is-indeterminate');
           progressBar.style.width = `${Math.round((e.loaded / e.total) * 100)}%`;
+        } else {
+          progress.classList.add('is-indeterminate');
         }
       };
       xhr.onload = () => {
-        progress.classList.remove('is-active');
+        progress.classList.remove('is-active', 'is-indeterminate');
         if (xhr.status >= 200 && xhr.status < 300) {
           let resp = {}; try { resp = JSON.parse(xhr.responseText); } catch {}
           const n = resp.count || selected.length;
-          selected = []; renderThumbs();
-          setStatus(`Terima kasih — your ${n === 1 ? 'moment is' : n + ' moments are'} with us.`);
+          showCeremony(n);
+          selected = [];
         } else {
-          let msg = 'Upload failed. Please try again.';
+          let msg = "We couldn't deliver those — let's try once more.";
           try { msg = JSON.parse(xhr.responseText).error || msg; } catch {}
+          lastError = msg;
           setStatus(msg, true);
-          setBtnDisabled(false);
+          retryRow.style.display = '';
+          uploadBtn.disabled = false;
+          uploadBtnD.disabled = false;
+          stickyCta.classList.add('is-visible');
         }
       };
       xhr.onerror = () => {
-        progress.classList.remove('is-active');
-        setStatus('Network error. Please try again.', true);
-        setBtnDisabled(false);
+        progress.classList.remove('is-active', 'is-indeterminate');
+        lastError = 'Network slowed down — your photos are still selected. Try again?';
+        setStatus(lastError, true);
+        retryRow.style.display = '';
+        uploadBtn.disabled = false;
+        uploadBtnD.disabled = false;
+        stickyCta.classList.add('is-visible');
       };
       xhr.send(fd);
     }
