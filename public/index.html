@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0e3b2a" />
+  <title>Wedding</title>
+  <meta name="description" content="A celebration. Share your moments with us." />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/style.css" />
+  <script src="/config.js"></script>
+  <script src="/hijri.js"></script>
+  <script src="/theme.js"></script>
+</head>
+<body>
+  <div class="container">
+    <!-- Tiny 8-point Rub el Hizb star above the Bismillah, in gold -->
+    <svg class="bismillah-star rise rise-1" viewBox="0 0 12 12" aria-hidden="true">
+      <g fill="currentColor">
+        <rect x="5.4" y="2.5" width="1.2" height="7"/>
+        <rect x="5.4" y="2.5" width="1.2" height="7" transform="rotate(45 6 6)"/>
+      </g>
+    </svg>
+
+    <p class="bismillah rise rise-2" lang="ar" dir="rtl">بِسْمِ ٱللَّٰهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ</p>
+    <p class="bismillah-translit fade">In the name of God, the Most Gracious, the Most Merciful</p>
+
+    <div class="hero">
+      <p class="eyebrow-label rise rise-2">The Wedding Of</p>
+
+      <h1 class="rise rise-3">
+        <span class="name" id="brideName">—</span>
+        <span class="ampersand">&amp;</span>
+        <span class="name" id="groomName">—</span>
+      </h1>
+
+      <div class="rule-diamond rise rise-4" aria-hidden="true">
+        <svg viewBox="0 0 280 16" xmlns="http://www.w3.org/2000/svg">
+          <line x1="6" y1="8" x2="124" y2="8" stroke="currentColor" stroke-width="0.6"/>
+          <path d="M140 1.5 L147.5 8 L140 14.5 L132.5 8 Z"
+                fill="none" stroke="currentColor" stroke-width="0.7"/>
+          <path d="M140 4.4 L143.8 8 L140 11.6 L136.2 8 Z" fill="currentColor"/>
+          <line x1="156" y1="8" x2="274" y2="8" stroke="currentColor" stroke-width="0.6"/>
+        </svg>
+      </div>
+
+      <p class="meta-combined rise rise-5">
+        <span id="weddingDate">—</span><span class="sep" id="venueSep">—</span><span class="venue" id="weddingVenue">—</span>
+      </p>
+
+      <p class="meta-hijri rise rise-5" id="hijriLine"></p>
+
+      <p class="tagline rise rise-6" id="tagline">—</p>
+
+      <div class="btn-row rise rise-6">
+        <a class="btn btn-primary" href="/upload.html">Share photos</a>
+        <a class="link-elegant" href="/gallery.html">View the gallery →</a>
+      </div>
+    </div>
+
+    <div class="foot fade-late">
+      <img class="seal" src="/monogram.svg" alt="Izzy and Adam monogram" />
+      <p class="hashtag" id="hashtag"></p>
+      <a class="meta-link" href="/qr.html">Print QR card</a>
+
+      <div class="theme-picker no-print" aria-label="Theme preview">
+        <p class="theme-picker-label">Themes</p>
+        <div class="theme-swatches">
+          <button class="theme-swatch" data-theme="default" aria-label="Engraved Emerald" type="button">
+            <span class="swatch-inner" style="--a:#0e3b2a;--b:#b08948"></span>
+          </button>
+          <button class="theme-swatch" data-theme="midnight" aria-label="Midnight Ivory" type="button">
+            <span class="swatch-inner" style="--a:#122b4a;--b:#c8a96a"></span>
+          </button>
+          <button class="theme-swatch" data-theme="rose" aria-label="Mughal Rose" type="button">
+            <span class="swatch-inner" style="--a:#5c1f30;--b:#c79a82"></span>
+          </button>
+          <button class="theme-swatch" data-theme="bronze" aria-label="Desert Bronze" type="button">
+            <span class="swatch-inner" style="--a:#4a4d2a;--b:#98794a"></span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const c = window.WEDDING_CONFIG || {};
+    document.title = `${c.brideName} & ${c.groomName} — Wedding`;
+    document.getElementById('brideName').textContent = c.brideName || '';
+    document.getElementById('groomName').textContent = c.groomName || '';
+
+    const dateText = formatDate(c.date) || c.date || '';
+    const venueText = (c.venue || '').toUpperCase();
+    document.getElementById('weddingDate').textContent = dateText;
+    document.getElementById('weddingVenue').textContent = venueText;
+    const sep = document.getElementById('venueSep');
+    if (dateText && venueText) sep.textContent = '—';
+    else sep.style.display = 'none';
+    document.getElementById('tagline').textContent = c.tagline || '';
+    document.getElementById('hashtag').textContent = c.hashtag || '';
+
+    // Hijri line — config override or computed
+    const hijriEl = document.getElementById('hijriLine');
+    if (c.hijriDate) {
+      hijriEl.textContent = c.hijriDate.toUpperCase();
+    } else if (c.date && window.Hijri) {
+      const d = new Date(c.date);
+      const formatted = window.Hijri.formatHijri(d);
+      hijriEl.textContent = formatted;
+    } else {
+      hijriEl.style.display = 'none';
+    }
+
+    function formatDate(s) {
+      if (!s) return '';
+      const d = new Date(s);
+      if (isNaN(d.getTime())) return '';
+      const dd = String(d.getDate()).padStart(2, '0');
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const yy = String(d.getFullYear()).slice(-2);
+      return `${dd} · ${mm} · ${yy}`;
+    }
+  </script>
+</body>
+</html>

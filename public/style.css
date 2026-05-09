@@ -1,0 +1,1395 @@
+/* ──────────────────────────────────────────────────────────────
+   Izzy & Adam — engraved editorial wedding stationery
+   Palette: vellum paper · antique gold · deep emerald · warm ink
+   ────────────────────────────────────────────────────────────── */
+
+@import url('https://fonts.googleapis.com/css2?family=Italiana&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,300;1,400&family=Inter:wght@400;500;600&family=Amiri:wght@400&display=swap');
+
+:root {
+  /* Paper / surface */
+  --paper:        #f5ecd6;
+  --paper-edge:   #e7dcc0;
+  --paper-white:  #fffaef;
+
+  /* Ink */
+  --ink:          #1a1612;
+  --ink-mute:     #8a7d65;
+
+  /* Emerald */
+  --emerald:      #0e3b2a;
+  --emerald-glow: #1f5d44;
+
+  /* Gold */
+  --gold:         #b08948;
+  --gold-leaf:    #d4af6b;
+  --gold-fade:    #e2d3b3;
+
+  --error:        #8c3a3a;
+
+  /* Type */
+  --display:  'Italiana', 'Cormorant Garamond', 'Times New Roman', serif;
+  --serif:    'Cormorant Garamond', 'Times New Roman', serif;
+  --sans:     'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --arabic:   'Amiri', 'Cormorant Garamond', serif;
+  --mono:     ui-monospace, 'SF Mono', 'Cascadia Mono', Menlo, Consolas, monospace;
+
+  /* Geometry */
+  --pad:         1.25rem;
+  --measure:     580px;
+  --radius-sm:   8px;
+  --radius:      14px;
+  --shadow-soft: 0 24px 60px rgba(26, 22, 18, 0.07);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+
+  /* Standard easing + durations — referenced everywhere for consistency */
+  --ease:    cubic-bezier(0.2, 0.7, 0.2, 1);
+  --ease-in: cubic-bezier(0.4, 0, 0.6, 0.2);
+  --t-fast:  180ms;
+  --t-base:  240ms;
+  --t-slow:  380ms;
+}
+
+/* ── Theme variants (data-theme on <html>) ──────────────────── */
+:root[data-theme="midnight"] {
+  --paper:        #f4ebd6;
+  --paper-edge:   #e6d6b8;
+  --paper-white:  #fbf3df;
+  --ink:          #1a2438;
+  --ink-mute:     #7d785f;
+  --emerald:      #122b4a;       /* deep midnight blue replaces emerald slot */
+  --emerald-glow: #1f3e63;
+  --gold:         #c8a96a;
+  --gold-leaf:    #e0c98a;
+  --gold-fade:    #ecdcb4;
+}
+:root[data-theme="rose"] {
+  --paper:        #f9eee5;
+  --paper-edge:   #f0dfd0;
+  --paper-white:  #fdf6ec;
+  --ink:          #2c1820;
+  --ink-mute:     #8a6e60;
+  --emerald:      #5c1f30;       /* deep burgundy */
+  --emerald-glow: #7a2d42;
+  --gold:         #c79a82;       /* rose gold */
+  --gold-leaf:    #d8b09b;
+  --gold-fade:    #ecd9c8;
+}
+:root[data-theme="bronze"] {
+  --paper:        #f0e3c8;
+  --paper-edge:   #e2d2af;
+  --paper-white:  #f8eed3;
+  --ink:          #2a2418;
+  --ink-mute:     #877d5a;
+  --emerald:      #4a4d2a;       /* warm olive */
+  --emerald-glow: #5d6033;
+  --gold:         #98794a;       /* bronze */
+  --gold-leaf:    #b3925f;
+  --gold-fade:    #ddc99c;
+}
+
+/* Cross-document View Transitions (Chrome 126+, Safari 18+; degrades gracefully). */
+@view-transition { navigation: auto; }
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.42s;
+  animation-timing-function: cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+html { scroll-behavior: smooth; }
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; padding: 0; min-height: 100%; }
+html { -webkit-text-size-adjust: 100%; }
+
+/* ── Body: vellum paper with very subtle warm grain ─────────── */
+body {
+  font-family: var(--sans);
+  font-size: 17px;
+  line-height: 1.55;
+  color: var(--ink);
+  background-color: var(--paper);
+  background-image:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.92' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.42  0 0 0 0 0.34  0 0 0 0 0.18  0 0 0 0.32 0'/></filter><rect width='240' height='240' filter='url(%23n)' opacity='0.55'/></svg>"),
+    radial-gradient(ellipse 90% 70% at 50% 0%, rgba(255, 250, 235, 0.6), transparent 65%),
+    radial-gradient(ellipse at 50% 100%, rgba(154, 130, 70, 0.06), transparent 55%);
+  background-attachment: fixed;
+  background-repeat: repeat, no-repeat, no-repeat;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
+  font-kerning: normal;
+}
+
+::selection { background: var(--gold-fade); color: var(--ink); text-shadow: 0 1px 0 rgba(255, 250, 235, 0.5); }
+
+/* ── Songket border (pucuk rebung) — page top + bottom ──────── */
+/* body needs a stacking context so we can place the borders BEHIND content. */
+body { isolation: isolate; }
+
+body::before,
+body::after {
+  content: '';
+  position: fixed;
+  left: 0; right: 0;
+  height: 4mm;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 14' preserveAspectRatio='xMidYMid meet'><g fill='none' stroke='%23b08948' stroke-width='0.5' stroke-linecap='round' stroke-linejoin='round'><path d='M0 12 L 6 2 L 12 12 M 12 12 L 18 2 L 24 12 M 24 12 L 30 2 L 36 12 M 36 12 L 42 2 L 48 12 M 48 12 L 54 2 L 60 12'/><path d='M3 12 L 6 6 L 9 12 M 15 12 L 18 6 L 21 12 M 27 12 L 30 6 L 33 12 M 39 12 L 42 6 L 45 12 M 51 12 L 54 6 L 57 12' opacity='0.55'/><line x1='0' y1='12' x2='60' y2='12' opacity='0.7'/></g></svg>");
+  background-repeat: repeat-x;
+  background-size: auto 100%;
+  opacity: 0.32;
+  pointer-events: none;
+  z-index: -1;            /* sits between body bg and content thanks to isolation above */
+}
+body::before {
+  top: 0;
+  /* Fade the inner edge (toward content) so peaks dissolve smoothly into paper. */
+  -webkit-mask-image: linear-gradient(to bottom, #000 35%, transparent 100%);
+          mask-image: linear-gradient(to bottom, #000 35%, transparent 100%);
+}
+body::after {
+  bottom: 0;
+  transform: scaleY(-1);
+  -webkit-mask-image: linear-gradient(to bottom, #000 35%, transparent 100%);
+          mask-image: linear-gradient(to bottom, #000 35%, transparent 100%);
+}
+
+/* ── Layout ─────────────────────────────────────────────────── */
+.container {
+  max-width: var(--measure);
+  margin: 0 auto;
+  padding: 1.75rem var(--pad) 3rem;
+}
+.container.has-sticky { padding-bottom: calc(7rem + var(--safe-bottom)); }
+
+/* ── Bismillah ──────────────────────────────────────────────── */
+.bismillah {
+  text-align: center;
+  font-family: var(--arabic);
+  font-size: 1.55rem;
+  color: var(--emerald);
+  margin: 0.25rem 0 0.5rem;
+  line-height: 1.35;
+  letter-spacing: 0.02em;
+}
+.bismillah-translit {
+  text-align: center;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 0.85rem;
+  color: var(--ink-mute);
+  letter-spacing: 0.02em;
+  margin: 0 0 2.25rem;
+}
+
+/* ── Eyebrow / small caps label ─────────────────────────────── */
+.eyebrow {
+  text-align: center;
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: 0.68rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  margin: 0 0 1rem;
+  padding: 0 1rem;
+  line-height: 1.7;
+  word-spacing: 0.15em;
+  text-wrap: balance;
+  max-width: 100%;
+  overflow-wrap: break-word;
+}
+
+/* ── Eyebrow label above hero names ─────────────────────────── */
+.eyebrow-label {
+  text-align: center;
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: 0.66rem;
+  letter-spacing: 0.45em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  margin: 0 0 1.5rem;
+  padding-left: 0.45em;  /* visually compensate trailing tracking */
+  font-feature-settings: "kern" 1, "tnum" 1;
+}
+.eyebrow-label::before,
+.eyebrow-label::after {
+  content: '';
+  display: inline-block;
+  width: 28px;
+  height: 1px;
+  background: var(--gold);
+  vertical-align: middle;
+  margin: 0 0.85em 0.18em;
+  opacity: 0.7;
+}
+
+/* ── Hero (landing) ─────────────────────────────────────────── */
+.hero {
+  text-align: center;
+  padding: 1rem 0 1.5rem;
+}
+.hero h1 {
+  font-family: var(--display);
+  font-weight: 400;
+  color: var(--emerald);
+  margin: 0;
+  line-height: 0.92;
+  letter-spacing: 0.002em;
+  font-size: clamp(4rem, 20vw, 5.6rem);
+  text-rendering: geometricPrecision;
+  font-feature-settings: "kern" 1, "liga" 1, "dlig" 1;
+  /* Sub-pixel gold-tinted shadow — invisible as a shadow, but adds depth */
+  text-shadow: 0 1px 0 rgba(154, 130, 70, 0.06);
+}
+.hero h1 .name { display: block; }
+.hero h1 .ampersand {
+  display: block;
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 300;
+  color: var(--gold);
+  font-size: 0.42em;
+  line-height: 1;
+  margin: 0.25em 0;
+  letter-spacing: 0;
+}
+
+/* Compact hero variant for upload + gallery pages */
+.hero h1.compact {
+  font-size: clamp(2.4rem, 10vw, 3.4rem);
+  line-height: 1.05;
+  letter-spacing: 0.005em;
+}
+.hero h1.compact .ampersand {
+  display: inline;
+  font-size: 0.85em;
+  margin: 0 0.18em;
+}
+.hero h1.compact .name { display: inline; }
+
+.hero .meta-line {
+  font-family: var(--display);
+  font-size: 1.05rem;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--ink);
+  margin: 0;
+  font-feature-settings: "tnum" 1, "lnum" 1;
+}
+.hero .meta-line + .meta-line {
+  margin-top: 0.55rem;
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: 0.7rem;
+  letter-spacing: 0.36em;
+  color: var(--ink-mute);
+}
+/* Combined date · venue. Stacks on mobile, single line on desktop. */
+.hero .meta-combined {
+  font-family: var(--display);
+  font-size: 0.95rem;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--ink);
+  margin: 0;
+  font-feature-settings: "tnum" 1, "lnum" 1;
+  line-height: 2;
+}
+.hero .meta-combined .sep {
+  display: block;     /* mobile: separator becomes its own thin row */
+  margin: 0.15rem 0;
+  font-family: var(--serif);
+  font-style: italic;
+  color: var(--gold);
+  letter-spacing: 0;
+  font-size: 0.85em;
+  line-height: 1;
+}
+.hero .meta-combined .venue {
+  color: var(--ink-mute);
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: 0.9em;
+  letter-spacing: 0.42em;
+  padding-left: 0.42em;  /* visual centring with trailing tracking */
+}
+.hero .tagline {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 1.15rem;
+  color: var(--ink);
+  margin: 1.75rem 0 0;
+  line-height: 1.5;
+}
+
+/* Jawi names (sits beneath English h1) — RTL Amiri italic gold */
+.name-jawi {
+  font-family: var(--arabic);
+  font-size: 1.35rem;
+  color: var(--gold);
+  text-align: center;
+  margin: 0.7rem 0 0;
+  letter-spacing: 0.02em;
+  direction: rtl;
+  line-height: 1.25;
+  opacity: 0.92;
+}
+.name-jawi .sep {
+  display: inline-block;
+  margin: 0 0.5em;
+  color: var(--gold-leaf);
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 0.85em;
+  vertical-align: 0.05em;
+}
+
+/* Hijri line — small gold tracked-caps below the Gregorian meta */
+.meta-hijri {
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: 0.6rem;
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin: 0.55rem 0 0;
+  padding-left: 0.42em;
+  font-feature-settings: "tnum" 1, "lnum" 1;
+}
+
+/* Bismillah ornament star (sits above the Bismillah line) */
+.bismillah-star {
+  display: block;
+  width: 12px;
+  height: 12px;
+  margin: 0.5rem auto 0.4rem;
+  color: var(--gold);
+  opacity: 0.85;
+}
+
+/* Standalone italic prompt (used on upload page above the card) */
+.italic-prompt {
+  text-align: center;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 1.15rem;
+  color: var(--ink);
+  margin: 0.5rem auto 1.25rem;
+  line-height: 1.45;
+  max-width: 24ch;
+  text-wrap: balance;
+}
+
+/* ── Rule with diamond ornament — THE divider ───────────────── */
+.rule-diamond {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 2.25rem 0;
+  color: var(--gold);
+}
+.rule-diamond svg {
+  width: min(280px, 72%);
+  height: auto;
+  display: block;
+  overflow: visible;
+}
+
+/* ── Buttons ────────────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 54px;
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: 0.8rem;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  text-decoration: none;
+  padding: 1.05rem 2.4rem 0.95rem;
+  border: none;
+  cursor: pointer;
+  background: transparent;
+  color: var(--ink);
+  -webkit-appearance: none;
+  appearance: none;
+  transition: background 0.25s ease, color 0.25s ease, transform 0.15s ease,
+              box-shadow 0.25s ease;
+  font-feature-settings: "kern" 1;
+}
+.btn:active { transform: translateY(1px); }
+
+.btn-primary {
+  background: var(--emerald);
+  color: var(--paper);
+  border-radius: 3px;
+  /* True engraved seal: paper gap + gold ring + soft drop */
+  box-shadow:
+    inset 0 1px 0 rgba(255, 250, 235, 0.08),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.18),
+    0 0 0 1px var(--emerald),
+    0 0 0 5px var(--paper),
+    0 0 0 6px var(--gold),
+    0 14px 32px rgba(14, 59, 42, 0.16),
+    0 4px 10px rgba(14, 59, 42, 0.12);
+  position: relative;
+  transition:
+    background var(--t-base) var(--ease),
+    box-shadow var(--t-base) var(--ease),
+    transform var(--t-fast) var(--ease);
+}
+.btn-primary:active {
+  box-shadow:
+    inset 0 2px 5px rgba(0, 0, 0, 0.22),
+    inset 0 -1px 0 rgba(255, 250, 235, 0.06),
+    0 0 0 1px var(--emerald-deep, var(--emerald)),
+    0 0 0 5px var(--paper),
+    0 0 0 5.5px var(--gold-fade),
+    0 2px 6px rgba(14, 59, 42, 0.08);
+}
+.btn-primary:hover {
+  background: var(--emerald-glow);
+  transform: translateY(-1px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 250, 235, 0.1),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.18),
+    0 0 0 1px var(--emerald-glow),
+    0 0 0 5px var(--paper),
+    0 0 0 6px var(--gold-leaf),
+    0 18px 40px rgba(14, 59, 42, 0.22),
+    0 6px 14px rgba(14, 59, 42, 0.14);
+}
+.btn-primary:focus-visible {
+  outline: 1.5px solid var(--gold-leaf);
+  outline-offset: 9px;
+}
+
+/* Secondary = italic gold text-link with thickening underline */
+.link-elegant {
+  display: inline-block;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 1.15rem;
+  font-weight: 400;
+  color: var(--gold);
+  text-decoration: none;
+  position: relative;
+  padding: 0.25rem 0.1rem 0.5rem;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+}
+.link-elegant::after {
+  content: '';
+  position: absolute;
+  left: 0.1rem; right: 0.1rem; bottom: 0.15rem;
+  height: 0.5px;
+  background: var(--gold-fade);
+  transition: height 0.25s ease, background-color 0.25s ease;
+}
+.link-elegant:hover::after { height: 1px; background-color: var(--gold); }
+.link-elegant:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--paper), 0 0 0 3.5px var(--gold-leaf);
+  border-radius: 2px;
+}
+
+/* Refined disabled state — desaturated emerald, reads as "not yet" not "broken" */
+.btn-primary:disabled {
+  background: #5a6f63;
+  color: rgba(255, 250, 235, 0.78);
+  cursor: not-allowed;
+  transform: none;
+  pointer-events: none;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 250, 235, 0.05),
+    0 0 0 1px #5a6f63,
+    0 0 0 5px var(--paper),
+    0 0 0 5.5px var(--gold-fade),
+    0 4px 10px rgba(26, 22, 18, 0.04);
+}
+.link-elegant:disabled {
+  opacity: 0.45; cursor: not-allowed; pointer-events: none;
+}
+
+.btn-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 2.25rem;
+}
+.btn-row .btn { width: min(100%, 280px); }
+
+/* ── Card with engraved double frame ─────────────────────────── */
+.card {
+  position: relative;
+  background: var(--paper-white);
+  border: 1px solid var(--gold);
+  outline: 0.5px solid var(--gold-fade);
+  outline-offset: 4px;
+  border-radius: 2px;
+  padding: 1.75rem 1.25rem;
+  margin: 1rem 0;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.6),
+    0 1px 0 rgba(176, 137, 72, 0.06),
+    0 28px 64px rgba(26, 22, 18, 0.08),
+    0 6px 18px rgba(26, 22, 18, 0.04);
+}
+
+/* ── Entrance animation cascade ─────────────────────────────── */
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.rise {
+  animation: rise-in 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+.rise-1 { animation-delay: 0.05s; }
+.rise-2 { animation-delay: 0.18s; }
+.rise-3 { animation-delay: 0.32s; }
+.rise-4 { animation-delay: 0.46s; }
+.rise-5 { animation-delay: 0.6s; }
+.rise-6 { animation-delay: 0.74s; }
+.fade   { animation: fade-in 1s ease-out both; }
+.fade-late { animation: fade-in 1.2s ease-out 0.5s both; }
+
+/* ── Upload page: dropzone ──────────────────────────────────── */
+.dropzone {
+  display: block;
+  position: relative;
+  border: 0.5px solid var(--gold);
+  outline: 0.5px solid var(--gold-fade);
+  outline-offset: 4px;
+  background: var(--paper);
+  padding: 2.25rem 1rem;
+  text-align: center;
+  cursor: pointer;
+  margin: 0.5rem 4px;
+  transition: background var(--t-base) var(--ease),
+              border-color var(--t-base) var(--ease),
+              box-shadow var(--t-base) var(--ease),
+              transform var(--t-fast) var(--ease);
+}
+.dropzone:hover, .dropzone.is-dragover {
+  background: var(--paper-edge);
+  border-color: var(--emerald);
+  box-shadow: inset 0 0 0 1px rgba(14, 59, 42, 0.05);
+}
+.dropzone:active { transform: scale(0.998); }
+.dropzone img.dz-art {
+  transition: transform var(--t-slow) var(--ease);
+}
+.dropzone:hover img.dz-art {
+  transform: translateY(-2px);
+}
+.dropzone svg {
+  width: 36px; height: 36px;
+  color: var(--gold);
+  margin-bottom: 0.6rem;
+  opacity: 0.85;
+}
+.dropzone img.dz-art {
+  display: block;
+  width: 84px;
+  height: auto;
+  margin: 0 auto 0.85rem;
+  color: var(--gold);
+  opacity: 0.92;
+}
+.dropzone .dz-title {
+  font-family: var(--display);
+  font-size: 0.78rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--ink);
+  margin: 0;
+}
+.dropzone .dz-sub {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 1rem;
+  color: var(--ink-mute);
+  margin: 0.4rem 0 0;
+}
+
+input[type="file"] { display: none; }
+
+/* ── Form fields (registration-card feel) ───────────────────── */
+.field { display: block; margin: 1.5rem 0 0; }
+.field > label {
+  display: block;
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: 0.7rem;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  margin-bottom: 0.6rem;
+}
+.field input[type="text"] {
+  display: block;
+  width: 100%;
+  min-height: 44px;
+  padding: 0.55rem 0.25rem;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 1.15rem;
+  color: var(--ink);
+  background: transparent;
+  border: none;
+  border-bottom: 0.5px solid var(--gold);
+  border-radius: 0;
+  outline: none;
+  transition: border-bottom-color 0.2s ease, border-bottom-width 0.2s ease;
+}
+.field input[type="text"]:focus {
+  outline: none;
+  border-bottom-color: var(--gold-leaf);
+  box-shadow: 0 1px 0 var(--gold-leaf);
+}
+.field input[type="text"]::placeholder {
+  color: var(--ink-mute);
+  opacity: 0.6;
+  font-style: italic;
+}
+
+/* ── Event picker ───────────────────────────────────────────── */
+.event-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.event-picker input[type="radio"] {
+  position: absolute; opacity: 0; pointer-events: none;
+}
+.event-picker label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 42px;
+  padding: 0.45rem 1.05rem;
+  border: 0.5px solid var(--gold);
+  border-radius: 999px;
+  background: transparent;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 1.05rem;
+  color: var(--ink);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+.event-picker label .chip-ornament {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  flex: 0 0 auto;
+  color: var(--gold);
+  transition: color var(--t-base) var(--ease);
+  /* Optical alignment: italic Cormorant's perceived center sits ~1px above
+     the geometric centre, so nudge the icon up to match. */
+  transform: translateY(-1px);
+}
+.event-picker label .chip-ornament svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.event-picker input[type="radio"]:checked + label .chip-ornament {
+  color: var(--gold-leaf);
+}
+.event-picker label:hover { background: var(--paper-white); }
+.event-picker input[type="radio"]:checked + label {
+  background: var(--emerald);
+  color: var(--paper-white);
+  border-color: var(--emerald);
+}
+.event-picker input[type="radio"]:focus-visible + label {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--paper), 0 0 0 3.5px var(--gold-leaf);
+}
+
+/* ── Selected files thumb grid ──────────────────────────────── */
+#fileList {
+  margin-top: 1.25rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
+  gap: 0.45rem;
+}
+.thumb {
+  position: relative;
+  aspect-ratio: 1;
+  overflow: hidden;
+  background: var(--paper-edge);
+  border: 0.5px solid var(--gold-fade);
+}
+.thumb img, .thumb video {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+}
+.thumb .badge {
+  position: absolute; top: 4px; right: 4px;
+  background: rgba(14, 59, 42, 0.9);
+  color: var(--paper);
+  font-family: var(--sans);
+  font-size: 0.62rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border-radius: 2px;
+}
+
+/* ── Status + progress ──────────────────────────────────────── */
+#status {
+  text-align: center;
+  margin: 1.25rem 0 0.25rem;
+  min-height: 1.5em;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 1.1rem;
+  color: var(--emerald);
+}
+#status.error { color: var(--error); }
+
+.progress {
+  margin-top: 0.85rem;
+  height: 2px;
+  background: var(--gold-fade);
+  overflow: hidden;
+  display: none;
+}
+.progress.is-active { display: block; }
+.progress-bar {
+  height: 100%; width: 0;
+  background: var(--gold);
+  transition: width 0.2s ease;
+}
+
+/* ── Sticky bottom CTA ──────────────────────────────────────── */
+.sticky-cta {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  padding: 0.8rem var(--pad) calc(0.8rem + var(--safe-bottom));
+  background: var(--paper);
+  border-top: 0.5px solid var(--gold-fade);
+  z-index: 50;
+}
+.sticky-cta .btn { width: 100%; max-width: 360px; margin: 0 auto; display: flex; }
+
+/* ── Gallery ────────────────────────────────────────────────── */
+.gallery-filters {
+  display: flex; flex-wrap: wrap; gap: 0.5rem;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+.gallery-filters button {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 1rem;
+  min-height: 38px;
+  padding: 0.4rem 1rem;
+  border-radius: 999px;
+  border: 0.5px solid var(--gold);
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+  transition: background var(--t-base) var(--ease),
+              color var(--t-base) var(--ease),
+              border-color var(--t-base) var(--ease),
+              box-shadow var(--t-base) var(--ease),
+              transform var(--t-fast) var(--ease);
+}
+.gallery-filters button:hover {
+  background: var(--paper-white);
+  border-color: var(--emerald);
+  box-shadow: 0 2px 8px rgba(26, 22, 18, 0.04);
+}
+.gallery-filters button:active { transform: translateY(1px); }
+.gallery-filters button.is-active {
+  background: var(--emerald);
+  color: var(--paper-white);
+  border-color: var(--emerald);
+  box-shadow: 0 2px 8px rgba(14, 59, 42, 0.18);
+}
+.gallery-filters .count {
+  margin-left: 0.45rem;
+  font-family: var(--sans);
+  font-style: normal;
+  font-size: 0.68rem;
+  letter-spacing: 0.18em;
+  opacity: 0.7;
+}
+
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 0.4rem;
+}
+.gallery a {
+  display: block;
+  aspect-ratio: 1;
+  overflow: hidden;
+  background: var(--paper-edge);
+  border: 0.5px solid var(--gold-fade);
+  transition: transform var(--t-base) var(--ease),
+              border-color var(--t-base) var(--ease),
+              box-shadow var(--t-base) var(--ease);
+  position: relative;
+}
+.gallery a:hover {
+  transform: translateY(-2px);
+  border-color: var(--gold);
+  box-shadow: 0 8px 22px rgba(26, 22, 18, 0.12);
+}
+.gallery a img,
+.gallery a video {
+  transition: transform var(--t-slow) var(--ease);
+}
+.gallery a:hover img,
+.gallery a:hover video {
+  transform: scale(1.04);
+}
+.gallery img, .gallery video {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+}
+.gallery .empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  color: var(--ink-mute);
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 1.1rem;
+  padding: 2.5rem 1rem;
+}
+.gallery .empty .rule-diamond { margin: 1rem auto; }
+
+/* Loading skeleton tile — gentle gold pulse */
+@keyframes gold-pulse {
+  0%, 100% { background-color: var(--gold-fade); opacity: 0.5; }
+  50%      { background-color: var(--gold-fade); opacity: 0.85; }
+}
+.gallery .skeleton {
+  display: block;
+  aspect-ratio: 1;
+  background: var(--gold-fade);
+  border: 0.5px solid var(--gold-fade);
+  animation: gold-pulse 1.4s ease-in-out infinite alternate;
+}
+
+/* ── QR card (the showpiece) ────────────────────────────────── */
+.qr-stage {
+  display: flex; justify-content: center;
+  padding: 1.5rem 0;
+}
+.qr-card {
+  position: relative;
+  width: 100%;
+  max-width: 380px;          /* mobile-safe; print mode resizes */
+  background: var(--paper-white);
+  padding: 2.75rem 2rem 2.5rem;
+  border: 1px solid var(--gold);
+  outline: 0.5px solid var(--gold-fade);
+  outline-offset: 7px;
+  text-align: center;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.7),
+    inset 0 -1px 0 rgba(176, 137, 72, 0.06),
+    0 1px 2px rgba(176, 137, 72, 0.08),
+    0 32px 72px rgba(26, 22, 18, 0.11),
+    0 8px 22px rgba(26, 22, 18, 0.06);
+  transition: box-shadow var(--t-slow) var(--ease);
+}
+.qr-card:hover {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.7),
+    inset 0 -1px 0 rgba(176, 137, 72, 0.08),
+    0 1px 2px rgba(176, 137, 72, 0.1),
+    0 38px 84px rgba(26, 22, 18, 0.13),
+    0 10px 26px rgba(26, 22, 18, 0.07);
+}
+.qr-card .bismillah {
+  font-size: 1.4rem;
+  margin: 0 0 1.25rem;
+  color: var(--emerald);
+}
+.qr-card h2 {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: 2.5rem;
+  color: var(--emerald);
+  margin: 0;
+  letter-spacing: 0.002em;
+  line-height: 1.05;
+  text-rendering: geometricPrecision;
+}
+.qr-card h2 .ampersand {
+  font-family: var(--serif);
+  font-style: italic;
+  color: var(--gold);
+  font-size: 0.82em;
+  margin: 0 0.14em;
+  letter-spacing: 0;
+}
+.qr-card .scan-prompt {
+  font-family: var(--serif);
+  font-style: italic;
+  color: var(--ink-mute);
+  margin: 1.1rem 0 0;
+  font-size: 1.05rem;
+  line-height: 1.45;
+}
+
+.qr-frame {
+  display: block;
+  width: fit-content;
+  align-self: center;          /* don't stretch in flex-column parent */
+  margin: 1.75rem auto 1.5rem;
+  padding: 0.9rem;
+  background: #fff;
+  border: 0.5px solid var(--gold);
+  outline: 0.5px solid var(--gold-fade);
+  outline-offset: 5px;
+  line-height: 0;
+  position: relative;
+  box-shadow: 0 4px 14px rgba(14, 59, 42, 0.08);
+}
+.qr-frame img, .qr-frame canvas, .qr-frame svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+.qr-card .visit-label {
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: 0.6rem;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  margin: 0.85rem 0 0.5rem;
+  position: relative;
+  display: inline-block;
+  padding: 0 0.6rem;
+}
+.qr-card .visit-label::before,
+.qr-card .visit-label::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 32px;
+  height: 1px;
+  background: var(--gold-fade);
+}
+.qr-card .visit-label::before { right: 100%; }
+.qr-card .visit-label::after  { left: 100%; }
+
+.qr-card .visit-url {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink-mute);
+  word-break: break-all;
+  margin: 0 0 1.5rem;
+  letter-spacing: 0.04em;
+  line-height: 1.5;
+}
+
+/* Small monogram ring container */
+.qr-card .seal-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 1rem auto 0.85rem;
+}
+.qr-card .seal-wrap::before,
+.qr-card .seal-wrap::after {
+  content: '';
+  flex: 1 1 auto;
+  height: 0.5px;
+  background: var(--gold-fade);
+  max-width: 40px;
+}
+.qr-card .seal-wrap::before { margin-right: 1rem; }
+.qr-card .seal-wrap::after  { margin-left: 1rem; }
+.qr-card .seal {
+  width: 60px; height: 60px;
+  display: block;
+  flex: 0 0 auto;
+}
+.qr-card .stamp {
+  font-family: var(--display);
+  font-size: 0.7rem;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin: 0;
+  font-feature-settings: "tnum" 1, "lnum" 1;
+}
+.qr-card .stamp-hijri {
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: 0.55rem;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin: 0.3rem 0 0;
+  padding-left: 0.4em;
+  opacity: 0.85;
+}
+.qr-card .name-jawi {
+  font-size: 1.25rem;
+  margin: 0.55rem 0 0;
+}
+
+/* Cropmarks (print only) */
+.cropmark {
+  position: absolute;
+  width: 14px; height: 14px;
+  border-color: var(--ink-mute);
+  border-style: solid;
+  border-width: 0;
+  display: none;
+}
+.cropmark.tl { top: -22px; left: -22px; border-top-width: 0.5px; border-left-width: 0.5px; }
+.cropmark.tr { top: -22px; right: -22px; border-top-width: 0.5px; border-right-width: 0.5px; }
+.cropmark.bl { bottom: -22px; left: -22px; border-bottom-width: 0.5px; border-left-width: 0.5px; }
+.cropmark.br { bottom: -22px; right: -22px; border-bottom-width: 0.5px; border-right-width: 0.5px; }
+
+/* ── Footer (landing) ───────────────────────────────────────── */
+.foot {
+  text-align: center;
+  margin-top: 3.5rem;
+  padding-top: 2.5rem;
+  position: relative;
+}
+.foot::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 1px;
+  background: var(--gold-fade);
+}
+.foot .seal {
+  width: 64px; height: 64px;
+  margin: 0 auto 1rem;
+  display: block;
+  transition: filter var(--t-base) var(--ease), transform var(--t-base) var(--ease);
+  cursor: default;
+}
+.foot .seal:hover {
+  filter: drop-shadow(0 0 10px rgba(212, 175, 107, 0.45));
+  transform: translateY(-1px);
+}
+.qr-card .seal {
+  transition: filter var(--t-base) var(--ease);
+}
+.qr-card .seal:hover {
+  filter: drop-shadow(0 0 8px rgba(212, 175, 107, 0.5));
+}
+.foot .hashtag {
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: 0.68rem;
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  margin: 0;
+  padding-left: 0.42em;
+}
+.foot .meta-link {
+  display: inline-block;
+  margin-top: 1.1rem;
+  font-family: var(--serif);
+  font-style: italic;
+  color: var(--gold);
+  text-decoration: none;
+  font-size: 0.95rem;
+  position: relative;
+  padding: 0.25rem 0.1rem 0.35rem;
+}
+.foot .meta-link::after {
+  content: '';
+  position: absolute;
+  left: 0.1rem; right: 0.1rem; bottom: 0.18rem;
+  height: 0.5px;
+  background: var(--gold-fade);
+  transition: height 0.25s ease, background-color 0.25s ease;
+}
+.foot .meta-link:hover::after { height: 1px; background-color: var(--gold); }
+
+/* ── Theme picker (landing footer only) ─────────────────────── */
+.theme-picker {
+  margin: 2.5rem auto 0;
+  text-align: center;
+  padding-top: 1.5rem;
+  position: relative;
+}
+.theme-picker::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 50px;
+  height: 0.5px;
+  background: var(--gold-fade);
+}
+.theme-picker-label {
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: 0.6rem;
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  margin: 0 0 0.85rem;
+  padding-left: 0.42em;
+}
+.theme-swatches {
+  display: inline-flex;
+  gap: 0.6rem;
+  justify-content: center;
+  align-items: center;
+}
+.theme-swatch {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  padding: 3px;
+  border: 0.5px solid var(--gold-fade);
+  background: var(--paper-white);
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  transition: transform var(--t-fast) var(--ease),
+              box-shadow var(--t-base) var(--ease),
+              border-color var(--t-base) var(--ease);
+}
+.theme-swatch:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(26, 22, 18, 0.12);
+  border-color: var(--gold);
+}
+.theme-swatch:active { transform: translateY(0); }
+.theme-swatch.is-active {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 2px var(--paper), 0 0 0 3.5px var(--gold-leaf);
+}
+.theme-swatch:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--paper), 0 0 0 3.5px var(--gold-leaf);
+}
+.swatch-inner {
+  display: block;
+  width: 100%; height: 100%;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--a) 0% 50%, var(--b) 50% 100%);
+}
+
+/* Back link (subdued) */
+.back-link {
+  display: inline-block;
+  font-family: var(--serif);
+  font-style: italic;
+  color: var(--ink-mute);
+  text-decoration: none;
+  font-size: 0.95rem;
+  margin-top: 2rem;
+}
+.back-link:hover { color: var(--gold); }
+
+/* ────────────────────────────────────────────────────────────
+   ≥ 640px (tablet / desktop)
+   ──────────────────────────────────────────────────────────── */
+@media (min-width: 640px) {
+  body { font-size: 16px; }
+  :root { --pad: 2.25rem; --measure: 620px; }
+
+  .container { padding: 3.5rem var(--pad) 4.5rem; }
+  .container.has-sticky { padding-bottom: 4rem; }
+
+  .hero { padding: 1.5rem 0 2rem; }
+  .hero h1 { font-size: clamp(6rem, 11vw, 9rem); line-height: 0.9; }
+  .hero h1 .ampersand { font-size: 0.34em; margin: 0.2em 0; }
+  .hero h1.compact { font-size: clamp(2.8rem, 6vw, 4rem); }
+
+  .bismillah { font-size: 1.95rem; margin-top: 1rem; letter-spacing: 0.025em; }
+  .bismillah-translit { margin-bottom: 2.75rem; font-size: 0.92rem; }
+
+  .eyebrow-label { font-size: 0.7rem; letter-spacing: 0.55em; margin-bottom: 2rem; }
+  .eyebrow-label::before,
+  .eyebrow-label::after { width: 38px; }
+
+  .card { padding: 2.75rem 2.25rem; }
+
+  .btn-row { flex-direction: row; justify-content: center; gap: 1.75rem; }
+  .btn-row .btn { width: auto; min-width: 240px; }
+
+  /* Hide mobile sticky CTA on desktop */
+  .sticky-cta { display: none; }
+  .desktop-only-cta { display: flex !important; }
+
+  .qr-card { max-width: 440px; padding: 3.5rem 2.75rem 3rem; }
+  .qr-card h2 { font-size: 3.2rem; }
+  .qr-card .seal { width: 68px; height: 68px; }
+
+  .eyebrow { letter-spacing: 0.3em; }
+
+  .foot .seal { width: 72px; height: 72px; }
+
+  /* Combined date · venue back to a single line on desktop */
+  .hero .meta-combined { font-size: 1rem; line-height: 1.6; }
+  .hero .meta-combined .sep {
+    display: inline-block;
+    margin: 0 0.95em 0.15em;
+    font-size: 1em;
+    vertical-align: middle;
+  }
+  .hero .meta-combined .venue {
+    font-family: var(--display);
+    font-weight: 400;
+    font-size: 1em;
+    letter-spacing: 0.32em;
+    padding-left: 0.32em;
+  }
+}
+
+.desktop-only-cta { display: none; }
+
+/* ────────────────────────────────────────────────────────────
+   Print — A6 portrait card, centered on A4
+   Content tightened to fit 105×148mm with 8mm padding.
+   ──────────────────────────────────────────────────────────── */
+@media print {
+  @page { size: A4; margin: 0; }
+
+  html, body {
+    background: var(--paper) !important;
+    background-image: none !important;
+    -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+  }
+  body::before, body::after { display: none !important; }
+  body * { visibility: hidden; }
+  .qr-stage, .qr-stage * { visibility: visible; }
+
+  .qr-stage {
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    padding: 0;
+    margin: 0;
+  }
+
+  .qr-card {
+    width: 105mm;
+    height: 148mm;
+    max-width: none;
+    padding: 8mm 8mm;
+    box-shadow: none;
+    border-color: var(--gold) !important;
+    outline-color: var(--gold-fade) !important;
+    outline-offset: 4px;
+    background: var(--paper-white) !important;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+  }
+
+  /* Tightened internal rhythm so 240px QR + content fits 132mm inner height */
+  .qr-card .bismillah     { font-size: 1.1rem;  margin: 0 0 0.45rem; }
+  .qr-card h2             { font-size: 1.85rem; line-height: 1.05; }
+  .qr-card .rule-diamond  { margin: 0.6rem 0 0.35rem !important; }
+  .qr-card .scan-prompt   { font-size: 0.85rem; margin: 0.4rem 0 0; line-height: 1.3; }
+  .qr-card .name-jawi     { font-size: 0.95rem; margin: 0.4rem 0 0; }
+
+  .qr-frame {
+    margin: 0.7rem 0 0.4rem;
+    padding: 1.5mm;
+    box-shadow: none;
+    outline-offset: 2px;
+  }
+  /* Force the QR to print at a known mm size */
+  .qr-frame img,
+  .qr-frame canvas {
+    width: 50mm !important;
+    height: 50mm !important;
+  }
+
+  .qr-card .visit-label   { font-size: 0.5rem;  margin: 0.45rem 0 0.2rem; padding: 0 0.4rem; }
+  .qr-card .visit-label::before,
+  .qr-card .visit-label::after { width: 18px; }
+  .qr-card .visit-url     { font-size: 0.62rem; margin: 0 0 0.5rem; line-height: 1.35; }
+
+  /* Push seal+stamp to bottom of card via auto top margin */
+  .qr-card .seal-wrap     { margin-top: auto; margin-bottom: 0.35rem; }
+  .qr-card .seal          { width: 14mm; height: 14mm; }
+  .qr-card .seal-wrap::before,
+  .qr-card .seal-wrap::after { max-width: 22px; }
+  .qr-card .stamp         { font-size: 0.55rem; }
+  .qr-card .stamp-hijri   { font-size: 0.5rem; margin-top: 0.18rem; opacity: 0.85; }
+
+  .cropmark { display: block; }
+  .no-print { display: none !important; }
+
+  /* ── Print 2-up — two compact cards stacked on a single A4 page ── */
+  body.print-2up .container {
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: none !important;
+  }
+  body.print-2up .qr-stage {
+    position: relative;
+    left: auto; top: auto; transform: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4mm;
+    padding: 4mm 0;
+    margin: 0;
+    width: 100%;
+  }
+  body.print-2up .qr-card {
+    width: 100mm;
+    height: 138mm;
+    padding: 6mm 7mm;
+    margin: 0 auto;
+    flex: 0 0 auto;
+  }
+  body.print-2up .qr-card .bismillah    { font-size: 1rem;  margin: 0 0 0.35rem; }
+  body.print-2up .qr-card h2            { font-size: 1.6rem; }
+  body.print-2up .qr-card .name-jawi    { font-size: 0.85rem; margin-top: 0.3rem; }
+  body.print-2up .qr-card .rule-diamond { margin: 0.45rem 0 0.25rem !important; }
+  body.print-2up .qr-card .scan-prompt  { font-size: 0.78rem; margin: 0.3rem 0 0; }
+  body.print-2up .qr-card .qr-frame     { margin: 0.5rem 0 0.3rem; padding: 1mm; }
+  body.print-2up .qr-card .qr-frame img,
+  body.print-2up .qr-card .qr-frame canvas { width: 42mm !important; height: 42mm !important; }
+  body.print-2up .qr-card .visit-label  { font-size: 0.45rem; margin: 0.3rem 0 0.15rem; }
+  body.print-2up .qr-card .visit-url    { font-size: 0.55rem; margin: 0 0 0.35rem; }
+  body.print-2up .qr-card .seal         { width: 11mm; height: 11mm; }
+  body.print-2up .qr-card .stamp        { font-size: 0.5rem; }
+  body.print-2up .qr-card .stamp-hijri  { font-size: 0.45rem; }
+}
+
+/* ── Reduced motion ─────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+  .rise, .fade, .fade-late {
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+  }
+}

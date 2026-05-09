@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0e3b2a" />
+  <title>Share photos</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/style.css" />
+  <script src="/config.js"></script>
+  <script src="/theme.js"></script>
+</head>
+<body>
+  <div class="container has-sticky">
+    <div class="hero" style="padding-bottom: 0.5rem;">
+      <h1 class="compact">
+        <span class="name" id="brideTop">—</span><span class="ampersand">&amp;</span><span class="name" id="groomTop">—</span>
+      </h1>
+    </div>
+
+    <div class="rule-diamond" aria-hidden="true">
+      <svg viewBox="0 0 280 16" xmlns="http://www.w3.org/2000/svg">
+        <line x1="6" y1="8" x2="124" y2="8" stroke="currentColor" stroke-width="0.6"/>
+        <path d="M140 1.5 L147.5 8 L140 14.5 L132.5 8 Z" fill="none" stroke="currentColor" stroke-width="0.7"/>
+        <path d="M140 4.4 L143.8 8 L140 11.6 L136.2 8 Z" fill="currentColor"/>
+        <line x1="156" y1="8" x2="274" y2="8" stroke="currentColor" stroke-width="0.6"/>
+      </svg>
+    </div>
+
+    <p class="italic-prompt" id="prompt">—</p>
+
+    <div class="card">
+      <label class="dropzone" id="dropzone" for="fileInput">
+        <img class="dz-art" src="/dropzone-art.svg" alt="" aria-hidden="true" />
+        <p class="dz-title">Choose photos &amp; videos</p>
+        <p class="dz-sub">tap, or drag &amp; drop here</p>
+        <input id="fileInput" type="file" accept="image/*,video/*" multiple />
+      </label>
+
+      <div class="field" id="eventField" style="display:none;">
+        <label>Which event?</label>
+        <div class="event-picker" id="eventPicker"></div>
+      </div>
+
+      <div class="field">
+        <label for="sender">Your name (optional)</label>
+        <input id="sender" type="text" maxlength="24" autocomplete="name" placeholder="e.g. Aunty Sara" />
+      </div>
+
+      <div id="fileList" aria-live="polite"></div>
+
+      <div class="progress" id="progress"><div class="progress-bar" id="progressBar"></div></div>
+      <p id="status" role="status"></p>
+
+      <div class="btn-row desktop-only-cta">
+        <button class="btn btn-primary" id="uploadBtnDesktop" disabled>Upload</button>
+        <a class="link-elegant" href="/gallery.html">View the gallery →</a>
+      </div>
+    </div>
+
+    <div style="text-align:center;">
+      <a class="back-link" href="/">← Back home</a>
+    </div>
+  </div>
+
+  <!-- Sticky bottom CTA — mobile only (hidden on desktop via CSS) -->
+  <div class="sticky-cta">
+    <button class="btn btn-primary" id="uploadBtn" disabled>Upload</button>
+  </div>
+
+  <script>
+    const c = window.WEDDING_CONFIG || {};
+    document.getElementById('brideTop').textContent = c.brideName || '';
+    document.getElementById('groomTop').textContent = c.groomName || '';
+    document.getElementById('prompt').textContent = c.uploadPrompt || '';
+    document.title = `Share photos — ${c.brideName} & ${c.groomName}`;
+
+    // ── Chip ornaments per event slug ──────────────────────
+    // Each is a tiny inline SVG, 14×14, single gold stroke.
+    const ORNAMENTS = {
+      // Henna leaf — Berinai
+      'berinai': '<svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="0.85" stroke-linecap="round" stroke-linejoin="round"><path d="M7 12.5 Q 3.6 9 3.6 6 Q 3.6 2.6 7 1.5 Q 10.4 2.6 10.4 6 Q 10.4 9 7 12.5 Z"/><line x1="7" y1="2" x2="7" y2="12" opacity="0.45"/></svg>',
+      // Two interlocking rings — Akad Nikah
+      'akad-nikah': '<svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="0.95"><circle cx="5" cy="7" r="2.9"/><circle cx="9" cy="7" r="2.9"/></svg>',
+      // Throne / dais — Bersanding (small arch with seat)
+      'bersanding': '<svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="0.85" stroke-linecap="round" stroke-linejoin="round"><path d="M2.4 11 L 2.4 5.4 Q 2.4 3.2 4.6 3.2 L 9.4 3.2 Q 11.6 3.2 11.6 5.4 L 11.6 11"/><line x1="1.5" y1="11.4" x2="12.5" y2="11.4"/><line x1="2.4" y1="7.4" x2="11.6" y2="7.4"/></svg>',
+      // Small fleuron — Lain-lain (default)
+      'lain-lain': '<svg viewBox="0 0 14 14" fill="currentColor"><ellipse cx="7" cy="3.4" rx="0.95" ry="2.2"/><ellipse cx="7" cy="10.6" rx="0.95" ry="2.2"/><ellipse cx="3.4" cy="7" rx="2.2" ry="0.95"/><ellipse cx="10.6" cy="7" rx="2.2" ry="0.95"/><circle cx="7" cy="7" r="0.9"/></svg>',
+    };
+    const DEFAULT_ORNAMENT = ORNAMENTS['lain-lain'];
+
+    // Render event picker if events are configured
+    const events = Array.isArray(c.events) ? c.events : [];
+    if (events.length > 0) {
+      const picker = document.getElementById('eventPicker');
+      const field = document.getElementById('eventField');
+      events.forEach((ev, i) => {
+        const id = `evt_${ev.slug}`;
+        const input = document.createElement('input');
+        input.type = 'radio'; input.name = 'event'; input.id = id; input.value = ev.slug;
+        if (i === 0) input.checked = true;
+        const label = document.createElement('label');
+        label.htmlFor = id;
+        const orn = document.createElement('span');
+        orn.className = 'chip-ornament';
+        orn.setAttribute('aria-hidden', 'true');
+        orn.innerHTML = ORNAMENTS[ev.slug] || DEFAULT_ORNAMENT;
+        label.appendChild(orn);
+        label.appendChild(document.createTextNode(ev.label));
+        picker.appendChild(input);
+        picker.appendChild(label);
+      });
+      field.style.display = '';
+    }
+    function getSelectedEvent() {
+      const checked = document.querySelector('input[name="event"]:checked');
+      return checked ? checked.value : 'lain-lain';
+    }
+
+    const dropzone   = document.getElementById('dropzone');
+    const fileInput  = document.getElementById('fileInput');
+    const fileList   = document.getElementById('fileList');
+    const uploadBtn  = document.getElementById('uploadBtn');
+    const uploadBtnD = document.getElementById('uploadBtnDesktop');
+    const senderEl   = document.getElementById('sender');
+    const statusEl   = document.getElementById('status');
+    const progress   = document.getElementById('progress');
+    const progressBar= document.getElementById('progressBar');
+
+    let selected = [];
+
+    function setStatus(msg, isError = false) {
+      statusEl.textContent = msg || '';
+      statusEl.classList.toggle('error', isError);
+    }
+    function setBtnDisabled(disabled) {
+      uploadBtn.disabled = disabled;
+      uploadBtnD.disabled = disabled;
+    }
+
+    function renderThumbs() {
+      fileList.innerHTML = '';
+      selected.forEach((file) => {
+        const thumb = document.createElement('div');
+        thumb.className = 'thumb';
+        const url = URL.createObjectURL(file);
+        if (file.type.startsWith('video/')) {
+          const v = document.createElement('video');
+          v.src = url; v.muted = true; v.playsInline = true;
+          thumb.appendChild(v);
+          const b = document.createElement('span');
+          b.className = 'badge'; b.textContent = 'video';
+          thumb.appendChild(b);
+        } else {
+          const img = document.createElement('img');
+          img.src = url; img.alt = file.name;
+          thumb.appendChild(img);
+        }
+        fileList.appendChild(thumb);
+      });
+      setBtnDisabled(selected.length === 0);
+    }
+
+    function addFiles(files) {
+      const arr = Array.from(files).filter((f) =>
+        f.type.startsWith('image/') || f.type.startsWith('video/')
+      );
+      selected = selected.concat(arr).slice(0, 30);
+      renderThumbs();
+      if (arr.length) setStatus(`${selected.length} ${selected.length === 1 ? 'moment' : 'moments'} ready to share.`);
+    }
+
+    fileInput.addEventListener('change', (e) => addFiles(e.target.files));
+
+    ;['dragenter', 'dragover'].forEach((evt) => {
+      dropzone.addEventListener(evt, (e) => {
+        e.preventDefault(); e.stopPropagation();
+        dropzone.classList.add('is-dragover');
+      });
+    });
+    ;['dragleave', 'drop'].forEach((evt) => {
+      dropzone.addEventListener(evt, (e) => {
+        e.preventDefault(); e.stopPropagation();
+        dropzone.classList.remove('is-dragover');
+      });
+    });
+    dropzone.addEventListener('drop', (e) => {
+      if (e.dataTransfer && e.dataTransfer.files) addFiles(e.dataTransfer.files);
+    });
+
+    function doUpload() {
+      if (!selected.length) return;
+      setBtnDisabled(true);
+      progress.classList.add('is-active');
+      progressBar.style.width = '0%';
+      setStatus('Uploading…');
+
+      const fd = new FormData();
+      const sender = senderEl.value.trim();
+      if (sender) fd.append('sender', sender);
+      fd.append('event', getSelectedEvent());
+      selected.forEach((f) => fd.append('files', f, f.name));
+
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', '/api/upload');
+      xhr.upload.onprogress = (e) => {
+        if (e.lengthComputable) {
+          progressBar.style.width = `${Math.round((e.loaded / e.total) * 100)}%`;
+        }
+      };
+      xhr.onload = () => {
+        progress.classList.remove('is-active');
+        if (xhr.status >= 200 && xhr.status < 300) {
+          let resp = {}; try { resp = JSON.parse(xhr.responseText); } catch {}
+          const n = resp.count || selected.length;
+          selected = []; renderThumbs();
+          setStatus(`Terima kasih — your ${n === 1 ? 'moment is' : n + ' moments are'} with us.`);
+        } else {
+          let msg = 'Upload failed. Please try again.';
+          try { msg = JSON.parse(xhr.responseText).error || msg; } catch {}
+          setStatus(msg, true);
+          setBtnDisabled(false);
+        }
+      };
+      xhr.onerror = () => {
+        progress.classList.remove('is-active');
+        setStatus('Network error. Please try again.', true);
+        setBtnDisabled(false);
+      };
+      xhr.send(fd);
+    }
+
+    uploadBtn.addEventListener('click', doUpload);
+    uploadBtnD.addEventListener('click', doUpload);
+  </script>
+</body>
+</html>

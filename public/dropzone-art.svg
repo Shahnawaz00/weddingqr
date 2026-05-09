@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 44"
+     fill="none" stroke="currentColor"
+     stroke-width="0.7" stroke-linecap="round" stroke-linejoin="round"
+     role="img" aria-label="Share photos">
+  <!-- Envelope body (back) -->
+  <rect x="4" y="16" width="52" height="24" rx="1"/>
+  <!-- Inside V — envelope is open at the top -->
+  <path d="M4 16 L 30 28 L 56 16" opacity="0.55"/>
+  <!-- Photo card emerging — paper-fill occludes the V behind -->
+  <rect x="14" y="4" width="32" height="22" rx="0.5" fill="#fffaef" stroke="currentColor"/>
+  <!-- Tiny image inside the photo: sun + mountain ridge -->
+  <circle cx="21" cy="11" r="1.4" fill="currentColor" stroke="none"/>
+  <path d="M16 21 L 22 14 L 28 18 L 36 11 L 44 21"/>
+</svg>

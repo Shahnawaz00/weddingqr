@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0e3b2a" />
+  <title>Gallery</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/style.css" />
+  <script src="/config.js"></script>
+  <script src="/theme.js"></script>
+</head>
+<body>
+  <div class="container">
+    <div class="hero" style="padding-bottom: 0.5rem;">
+      <h1 class="compact">
+        <span class="name" id="brideTop">—</span><span class="ampersand">&amp;</span><span class="name" id="groomTop">—</span>
+      </h1>
+    </div>
+
+    <div class="rule-diamond" aria-hidden="true">
+      <svg viewBox="0 0 280 16" xmlns="http://www.w3.org/2000/svg">
+        <line x1="6" y1="8" x2="124" y2="8" stroke="currentColor" stroke-width="0.6"/>
+        <path d="M140 1.5 L147.5 8 L140 14.5 L132.5 8 Z" fill="none" stroke="currentColor" stroke-width="0.7"/>
+        <path d="M140 4.4 L143.8 8 L140 11.6 L136.2 8 Z" fill="currentColor"/>
+        <line x1="156" y1="8" x2="274" y2="8" stroke="currentColor" stroke-width="0.6"/>
+      </svg>
+    </div>
+
+    <p class="eyebrow">A collection of your moments</p>
+
+    <div class="card">
+      <div class="gallery-filters" id="filters"></div>
+      <div class="gallery" id="gallery">
+        <span class="skeleton" aria-hidden="true"></span>
+        <span class="skeleton" aria-hidden="true"></span>
+        <span class="skeleton" aria-hidden="true"></span>
+        <span class="skeleton" aria-hidden="true"></span>
+        <span class="skeleton" aria-hidden="true"></span>
+        <span class="skeleton" aria-hidden="true"></span>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <a class="btn btn-primary" href="/upload.html">Add more photos</a>
+      <a class="link-elegant" href="/">← Home</a>
+    </div>
+  </div>
+
+  <script>
+    const c = window.WEDDING_CONFIG || {};
+    document.getElementById('brideTop').textContent = c.brideName || '';
+    document.getElementById('groomTop').textContent = c.groomName || '';
+    document.title = `Gallery — ${c.brideName} & ${c.groomName}`;
+
+    const gallery = document.getElementById('gallery');
+    const filtersEl = document.getElementById('filters');
+    const events = Array.isArray(c.events) ? c.events : [];
+    let allPhotos = [];
+    let active = 'all';
+
+    function render() {
+      gallery.innerHTML = '';
+      const visible = active === 'all'
+        ? allPhotos
+        : allPhotos.filter((p) => p.event === active);
+
+      if (visible.length === 0) {
+        const empty = document.createElement('div');
+        empty.className = 'empty';
+        empty.innerHTML = active === 'all'
+          ? `No moments yet.
+             <div class="rule-diamond" aria-hidden="true">
+               <svg viewBox="0 0 220 14" xmlns="http://www.w3.org/2000/svg">
+                 <line x1="6" y1="7" x2="98" y2="7" stroke="currentColor" stroke-width="0.6"/>
+                 <path d="M110 1.5 L116.5 7 L110 12.5 L103.5 7 Z" fill="none" stroke="currentColor" stroke-width="0.7"/>
+                 <path d="M110 4 L113.2 7 L110 10 L106.8 7 Z" fill="currentColor"/>
+                 <line x1="122" y1="7" x2="214" y2="7" stroke="currentColor" stroke-width="0.6"/>
+               </svg>
+             </div>
+             Be the first to share.`
+          : `No moments in this album yet.`;
+        gallery.appendChild(empty);
+        return;
+      }
+
+      visible.forEach((p) => {
+        const a = document.createElement('a');
+        a.href = p.url; a.target = '_blank'; a.rel = 'noopener';
+        if (p.isVideo) {
+          const v = document.createElement('video');
+          v.src = p.url; v.muted = true; v.playsInline = true; v.preload = 'metadata';
+          a.appendChild(v);
+        } else {
+          const img = document.createElement('img');
+          img.src = p.url; img.loading = 'lazy'; img.alt = '';
+          a.appendChild(img);
+        }
+        gallery.appendChild(a);
+      });
+    }
+
+    function buildFilters() {
+      filtersEl.innerHTML = '';
+      const counts = { all: allPhotos.length };
+      allPhotos.forEach((p) => { counts[p.event] = (counts[p.event] || 0) + 1; });
+
+      const mkChip = (slug, label) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = slug === active ? 'is-active' : '';
+        btn.innerHTML = `${label} <span class="count">${counts[slug] || 0}</span>`;
+        btn.addEventListener('click', () => { active = slug; buildFilters(); render(); });
+        return btn;
+      };
+
+      filtersEl.appendChild(mkChip('all', 'All'));
+      const seen = new Set();
+      events.forEach((ev) => {
+        seen.add(ev.slug);
+        filtersEl.appendChild(mkChip(ev.slug, ev.label));
+      });
+      Object.keys(counts).forEach((slug) => {
+        if (slug === 'all' || seen.has(slug)) return;
+        filtersEl.appendChild(mkChip(slug, slug));
+      });
+    }
+
+    fetch('/api/photos')
+      .then((r) => r.json())
+      .then((data) => {
+        allPhotos = (data.ok && data.photos) || [];
+        buildFilters();
+        render();
+      })
+      .catch(() => {
+        gallery.innerHTML = '';
+        const empty = document.createElement('div');
+        empty.className = 'empty';
+        empty.textContent = 'Could not load gallery.';
+        gallery.appendChild(empty);
+      });
+  </script>
+</body>
+</html>

@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0e3b2a" />
+  <title>Scan to share</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/style.css" />
+  <script src="/config.js"></script>
+  <script src="/hijri.js"></script>
+  <script src="/theme.js"></script>
+  <!-- qrcodejs by davidshimjs — pure-browser, no build step. -->
+  <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs@04f46c6/qrcode.min.js"></script>
+</head>
+<body>
+  <div class="container">
+    <div class="qr-stage fade">
+      <div class="qr-card">
+        <span class="cropmark tl" aria-hidden="true"></span>
+        <span class="cropmark tr" aria-hidden="true"></span>
+        <span class="cropmark bl" aria-hidden="true"></span>
+        <span class="cropmark br" aria-hidden="true"></span>
+
+        <p class="bismillah" lang="ar" dir="rtl">بِسْمِ ٱللَّٰهِ</p>
+
+        <h2><span id="brideName">—</span><span class="ampersand">&amp;</span><span id="groomName">—</span></h2>
+
+        <!-- Leafed diamond divider — alternate ornate motif used on QR card -->
+        <div class="rule-diamond" aria-hidden="true" style="margin: 1.4rem 0 0.4rem;">
+          <svg viewBox="0 0 240 16" xmlns="http://www.w3.org/2000/svg">
+            <line x1="6" y1="8" x2="86" y2="8" stroke="currentColor" stroke-width="0.6"/>
+            <!-- left leaf -->
+            <path d="M92 8 Q 96 4 100 8 Q 96 12 92 8 Z" fill="currentColor" opacity="0.7"/>
+            <!-- diamond outline + inner fill -->
+            <path d="M120 1.2 L127 8 L120 14.8 L113 8 Z" fill="none" stroke="currentColor" stroke-width="0.7"/>
+            <path d="M120 4 L123.2 8 L120 12 L116.8 8 Z" fill="currentColor"/>
+            <!-- right leaf -->
+            <path d="M140 8 Q 144 4 148 8 Q 144 12 140 8 Z" fill="currentColor" opacity="0.7"/>
+            <line x1="154" y1="8" x2="234" y2="8" stroke="currentColor" stroke-width="0.6"/>
+          </svg>
+        </div>
+
+        <p class="scan-prompt" id="prompt">Scan to share your moments</p>
+
+        <div class="qr-frame" id="qrcode" aria-label="QR code"></div>
+
+        <p class="visit-label">or visit</p>
+        <p class="visit-url" id="qrUrl"></p>
+
+        <div class="seal-wrap" aria-hidden="true">
+          <img class="seal" src="/monogram.svg" alt="" />
+        </div>
+        <p class="stamp" id="stamp">—</p>
+        <p class="stamp-hijri" id="stampHijri"></p>
+      </div>
+    </div>
+
+    <div class="btn-row no-print">
+      <button class="btn btn-primary" onclick="window.print()">Print this card</button>
+      <a class="link-elegant" href="/">← Back home</a>
+    </div>
+  </div>
+
+  <script>
+    const c = window.WEDDING_CONFIG || {};
+    document.getElementById('brideName').textContent = c.brideName || '';
+    document.getElementById('groomName').textContent = c.groomName || '';
+    document.getElementById('prompt').textContent = c.uploadPrompt || 'Scan to share your moments';
+    document.title = `Scan to share — ${c.brideName} & ${c.groomName}`;
+
+    const dateStr = formatDate(c.date);
+    const venue   = (c.venue || '').toUpperCase();
+    document.getElementById('stamp').textContent = [dateStr, venue].filter(Boolean).join('  ·  ');
+
+    // Hijri line (auto-compute or override)
+    const hijriEl = document.getElementById('stampHijri');
+    if (c.hijriDate) {
+      hijriEl.textContent = c.hijriDate.toUpperCase();
+    } else if (c.date && window.Hijri) {
+      hijriEl.textContent = window.Hijri.formatHijri(new Date(c.date));
+    } else {
+      hijriEl.style.display = 'none';
+    }
+
+    const uploadUrl = `${window.location.origin}/upload.html`;
+    document.getElementById('qrUrl').textContent = uploadUrl;
+
+    // Read theme's primary ink colour so the QR matches whichever theme is active.
+    const themeDark = getComputedStyle(document.documentElement)
+      .getPropertyValue('--emerald').trim() || '#0e3b2a';
+
+    new QRCode(document.getElementById('qrcode'), {
+      text: uploadUrl,
+      width: 240,
+      height: 240,
+      colorDark:  themeDark,
+      colorLight: '#ffffff',
+      correctLevel: QRCode.CorrectLevel.M,
+    });
+
+    // ── Print 2-up via ?per=2 ────────────────────────────────
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('per') === '2') {
+      document.body.classList.add('print-2up');
+      const card = document.querySelector('.qr-card');
+      const clone = card.cloneNode(true);
+      // Re-render QR into the cloned container (cloneNode copies HTML, not canvas pixels)
+      const cloneQrEl = clone.querySelector('#qrcode');
+      cloneQrEl.id = 'qrcode-clone';
+      cloneQrEl.innerHTML = '';
+      card.parentNode.appendChild(clone);
+      new QRCode(cloneQrEl, {
+        text: uploadUrl,
+        width: 240,
+        height: 240,
+        colorDark:  themeDark,
+        colorLight: '#ffffff',
+        correctLevel: QRCode.CorrectLevel.M,
+      });
+    }
+
+    function formatDate(s) {
+      if (!s) return '';
+      const d = new Date(s);
+      if (isNaN(d.getTime())) return '';
+      const dd = String(d.getDate()).padStart(2, '0');
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const yy = String(d.getFullYear()).slice(-2);
+      return `${dd} · ${mm} · ${yy}`;
+    }
+  </script>
+</body>
+</html>
