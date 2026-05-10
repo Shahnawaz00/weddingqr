@@ -4,7 +4,19 @@
    border pattern, and button silhouette — not just hue.
    ────────────────────────────────────────────────────────────── */
 
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,300;1,400&family=Inter:wght@400;500;600&family=Amiri:wght@400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,300;1,9..144,400&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,300;1,400&family=Inter:wght@400;500;600&family=Amiri:wght@400&display=swap');
+
+/* ── Registered custom properties — power the gold-leaf shimmer ── */
+@property --shimmer-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+@property --shimmer-pos {
+  syntax: '<percentage>';
+  initial-value: -40%;
+  inherits: false;
+}
 
 /* ════════════════════════════════════════════════════════════════
    THEME TOKENS
@@ -33,9 +45,10 @@
 
   --error:        #8c3a3a;
 
-  /* Type */
-  --display:  'Cormorant Garamond', 'Times New Roman', serif;
-  --serif:    'Cormorant Garamond', 'Times New Roman', serif;
+  /* Type — Fraunces variable carries display, Cormorant carries italics */
+  --display:  'Fraunces', 'Cormorant Garamond', 'Times New Roman', serif;
+  --serif:    'Fraunces', 'Cormorant Garamond', 'Times New Roman', serif;
+  --italic:   'Cormorant Garamond', 'Fraunces', 'Times New Roman', serif;  /* italic anchor */
   --sans:     'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --arabic:   'Amiri', 'Cormorant Garamond', serif;
   --mono:     ui-monospace, 'SF Mono', 'Cascadia Mono', Menlo, Consolas, monospace;
@@ -162,6 +175,17 @@ html { scroll-behavior: smooth; }
 html, body { margin: 0; padding: 0; min-height: 100%; }
 html { -webkit-text-size-adjust: 100%; }
 
+/* ── Custom cursor (desktop only — hairline gold cross with
+       a centred diamond pip, evoking an engraver's burin tip) ── */
+@media (hover: hover) and (pointer: fine) {
+  html, body {
+    cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 28 28'><g fill='none' stroke='%23a7823c' stroke-width='0.6' stroke-linecap='round'><line x1='14' y1='4' x2='14' y2='12'/><line x1='14' y1='16' x2='14' y2='24'/><line x1='4' y1='14' x2='12' y2='14'/><line x1='16' y1='14' x2='24' y2='14'/><path d='M14 12.5 L 15.5 14 L 14 15.5 L 12.5 14 Z' fill='%23a7823c'/></g></svg>") 14 14, default;
+  }
+  a, button, .link-elegant, .btn, .theme-swatch, .event-picker label, .gallery-filters button, .dropzone, .gallery a, .lb-close, [role='button'] {
+    cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 28 28'><g fill='none' stroke='%23a7823c' stroke-width='0.8' stroke-linecap='round'><circle cx='14' cy='14' r='5.5' stroke='%23a7823c'/><path d='M14 9.5 L 15.6 14 L 14 18.5 L 12.4 14 Z' fill='%23a7823c'/></g></svg>") 14 14, pointer;
+  }
+}
+
 /* ── Body: vellum paper with quiet, long-wave grain ─────────── */
 body {
   font-family: var(--sans);
@@ -219,20 +243,50 @@ body::after  { bottom: 0; transform: scaleY(-1); }
 }
 .container.has-sticky { padding-bottom: calc(7rem + var(--safe-bottom)); }
 
-/* ── Bismillah ──────────────────────────────────────────────── */
+/* ── Bismillah — illuminated panel treatment ────────────────────
+   The Arabic sits in a cartouche framed by four hand-drawn corner
+   flourishes that fade in after the unfurl animation. On mobile
+   the corners shrink to dots; on desktop they're real ornaments. */
 .bismillah {
   text-align: center;
   font-family: var(--arabic);
-  font-size: 1.55rem;
+  font-size: 1.65rem;
   color: var(--primary);
-  margin: 0.25rem 0 0.5rem;
+  margin: 0.25rem auto 0.5rem;
+  padding: 0.4rem 1.4rem;
   line-height: 1.35;
   letter-spacing: 0.02em;
   text-wrap: balance;
+  max-width: 22ch;
+  position: relative;
+  display: block;
+}
+/* Corner flourishes via two backgrounds — short hairlines at each of
+   the four corners that form an open frame around the Bismillah. */
+.bismillah::before,
+.bismillah::after {
+  content: '';
+  position: absolute;
+  width: 18px;
+  height: 14px;
+  pointer-events: none;
+  opacity: 0.75;
+}
+.bismillah::before {
+  top: -2px; left: 0;
+  border-top: 0.6px solid var(--gold);
+  border-left: 0.6px solid var(--gold);
+  border-top-left-radius: 2px;
+}
+.bismillah::after {
+  bottom: -2px; right: 0;
+  border-bottom: 0.6px solid var(--gold);
+  border-right: 0.6px solid var(--gold);
+  border-bottom-right-radius: 2px;
 }
 .bismillah-translit {
   text-align: center;
-  font-family: var(--serif);
+  font-family: var(--italic);
   font-style: italic;
   font-size: 0.85rem;
   color: var(--ink-mute);
@@ -285,40 +339,72 @@ body::after  { bottom: 0; transform: scaleY(-1); }
 .hero h1 {
   font-family: var(--display);
   font-weight: 400;
+  font-variation-settings: "opsz" 144;     /* Fraunces variable: display-size optical scale */
+  font-optical-sizing: auto;
   color: var(--primary);
   margin: 0;
-  line-height: 0.92;
-  letter-spacing: 0.002em;
-  font-size: clamp(4rem, 20vw, 5.6rem);
+  line-height: 0.86;
+  letter-spacing: -0.015em;                 /* tighter — Fraunces at display likes negative tracking */
+  font-size: clamp(4.2rem, 22vw, 7.2rem);
   text-rendering: geometricPrecision;
-  font-feature-settings: "kern" 1, "liga" 1, "dlig" 1;
+  font-feature-settings: "kern" 1, "liga" 1, "dlig" 1, "ss01" 1, "ss02" 1;
   text-shadow: 0 1px 0 rgba(154, 130, 70, 0.06);
   text-wrap: balance;
 }
-.hero h1 .name { display: block; }
+.hero h1 .name {
+  display: block;
+  font-variation-settings: "SOFT" 50;       /* let opsz follow `font-optical-sizing: auto` */
+}
+/* Ampersand: dramatic italic, draws a metallic shimmer that lives on idle */
 .hero h1 .ampersand {
   display: block;
-  font-family: var(--serif);
+  font-family: var(--italic);
   font-style: italic;
   font-weight: 300;
-  color: var(--gold);
-  font-size: 0.42em;
+  font-size: 0.55em;
   line-height: 1;
-  margin: 0.25em 0;
+  margin: 0.05em 0 -0.05em;
   letter-spacing: 0;
+  color: var(--gold);
+  /* Real gold-leaf shimmer — conic gradient with registered angle */
+  background: conic-gradient(from var(--shimmer-angle, 0deg) at 50% 50%,
+    var(--gold-deep) 0deg,
+    var(--gold) 70deg,
+    var(--gold-leaf) 120deg,
+    color-mix(in oklab, var(--gold-leaf) 80%, white 20%) 180deg,
+    var(--gold-leaf) 240deg,
+    var(--gold) 290deg,
+    var(--gold-deep) 360deg);
+  -webkit-background-clip: text;
+          background-clip: text;
+  -webkit-text-fill-color: transparent;
+          color: transparent;
+  animation: shimmer-roll 14s linear infinite;
+}
+@keyframes shimmer-roll {
+  to { --shimmer-angle: 360deg; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero h1 .ampersand { animation: none; }
 }
 
 .hero h1.compact {
   font-size: clamp(2.4rem, 10vw, 3.4rem);
   line-height: 1.05;
-  letter-spacing: 0.005em;
+  letter-spacing: -0.005em;
+  font-variation-settings: normal;
 }
 .hero h1.compact .ampersand {
   display: inline;
   font-size: 0.85em;
-  margin: 0 0.18em;
+  margin: 0 0.22em;
+  /* keep shimmer on compact too, but slightly subtler */
+  animation-duration: 18s;
 }
-.hero h1.compact .name { display: inline; }
+.hero h1.compact .name {
+  display: inline;
+  font-variation-settings: "SOFT" 30;
+}
 
 .hero .meta-line {
   font-family: var(--display);
@@ -406,16 +492,21 @@ body::after  { bottom: 0; transform: scaleY(-1); }
   font-feature-settings: "tnum" 1, "lnum" 1;
 }
 
-/* ── Bismillah ornament (theme-driven, mask-image) ──────────── */
+/* ── Bismillah ornament (theme-driven, mask-image, gold-leaf shimmer) ── */
 .bismillah-star {
   display: block;
-  width: 16px;
-  height: 16px;
-  margin: 0.5rem auto 0.4rem;
-  background-color: var(--gold);
+  width: 18px;
+  height: 18px;
+  margin: 0.6rem auto 0.4rem;
+  background: conic-gradient(from var(--shimmer-angle, 0deg) at 50% 50%,
+    var(--gold-deep), var(--gold), var(--gold-leaf), var(--gold), var(--gold-deep));
   -webkit-mask: var(--ornament-bismillah) center/contain no-repeat;
           mask: var(--ornament-bismillah) center/contain no-repeat;
-  opacity: 0.92;
+  animation: shimmer-roll 11s linear infinite;
+  filter: drop-shadow(0 1px 0 rgba(255, 250, 235, 0.4));
+}
+@media (prefers-reduced-motion: reduce) {
+  .bismillah-star { animation: none; }
 }
 
 /* Standalone italic prompt (used on upload page above the card) */
@@ -431,14 +522,13 @@ body::after  { bottom: 0; transform: scaleY(-1); }
   text-wrap: balance;
 }
 
-/* ── Rule with theme ornament — flex + tapered gradient lines ──
-   Lines fade in from the outer edge into the centred ornament.
-   ──────────────────────────────────────────────────────────── */
+/* ── Rule with theme ornament — gold lines that ink themselves in,
+       centre ornament shimmers continuously ─────────────────── */
 .rule-diamond {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 0.85rem;
+  gap: 0.95rem;
   margin: 2.25rem 0;
   color: var(--gold);
 }
@@ -447,29 +537,40 @@ body::after  { bottom: 0; transform: scaleY(-1); }
   content: '';
   flex: 0 1 124px;
   height: 0.6px;
-  /* Taper: invisible at outer end, full at inner end */
-  background: linear-gradient(to right,
+  background-image: linear-gradient(to right,
     transparent 0%,
-    color-mix(in oklab, var(--gold) 40%, transparent) 18%,
-    var(--gold) 70%,
-    var(--gold) 100%);
+    color-mix(in oklab, var(--gold) 30%, transparent) 12%,
+    var(--gold) 60%,
+    var(--gold-leaf) 100%);
+  background-size: 0% 100%;          /* starts invisible, ink draws in */
+  background-repeat: no-repeat;
+  animation: rule-ink 1.4s cubic-bezier(0.2, 0.7, 0.2, 1) 0.4s forwards;
 }
+.rule-diamond::before { background-position: right center; }
 .rule-diamond::after {
-  background: linear-gradient(to left,
+  background-image: linear-gradient(to left,
     transparent 0%,
-    color-mix(in oklab, var(--gold) 40%, transparent) 18%,
-    var(--gold) 70%,
-    var(--gold) 100%);
+    color-mix(in oklab, var(--gold) 30%, transparent) 12%,
+    var(--gold) 60%,
+    var(--gold-leaf) 100%);
+  background-position: left center;
+  animation: rule-ink 1.4s cubic-bezier(0.2, 0.7, 0.2, 1) 0.4s forwards;
+}
+@keyframes rule-ink {
+  to { background-size: 100% 100%; }
 }
 .rule-diamond .ornament,
 .rule-diamond > svg {
   display: block;
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
   flex: 0 0 auto;
-  background-color: var(--gold);
+  background: conic-gradient(from var(--shimmer-angle, 0deg) at 50% 50%,
+    var(--gold-deep), var(--gold), var(--gold-leaf), var(--gold), var(--gold-deep));
   -webkit-mask: var(--ornament-rule) center/contain no-repeat;
           mask: var(--ornament-rule) center/contain no-repeat;
+  animation: shimmer-roll 13s linear infinite;
+  filter: drop-shadow(0 1px 0 rgba(255, 250, 235, 0.35));
 }
 /* Legacy inline-SVG variant (kept for any page still using it) */
 .rule-diamond > svg {
@@ -479,10 +580,15 @@ body::after  { bottom: 0; transform: scaleY(-1); }
           mask: none;
   height: auto;
   overflow: visible;
+  animation: none;
 }
-/* When rule-diamond contains an inline SVG, suppress the pseudo lines */
 .rule-diamond:has(> svg)::before,
 .rule-diamond:has(> svg)::after { display: none; }
+@media (prefers-reduced-motion: reduce) {
+  .rule-diamond::before,
+  .rule-diamond::after { background-size: 100% 100%; animation: none; }
+  .rule-diamond .ornament { animation: none; }
+}
 
 /* ── Buttons ────────────────────────────────────────────────── */
 .btn {
@@ -528,6 +634,33 @@ body::after  { bottom: 0; transform: scaleY(-1); }
     0 0 0 6px var(--gold),
     0 12px 28px rgba(0, 0, 0, 0.14);
   position: relative;
+  overflow: hidden;
+}
+/* Idle gold-leaf shimmer — a soft diagonal sheen rolls across the
+   button surface every ~9s. Subtle: max 8% lightness lift, never a
+   "scanning" effect. */
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    115deg,
+    transparent var(--shimmer-pos, -40%),
+    color-mix(in oklab, var(--gold-leaf) 22%, transparent) calc(var(--shimmer-pos, -40%) + 8%),
+    color-mix(in oklab, var(--gold-leaf) 42%, transparent) calc(var(--shimmer-pos, -40%) + 16%),
+    color-mix(in oklab, var(--gold-leaf) 22%, transparent) calc(var(--shimmer-pos, -40%) + 24%),
+    transparent calc(var(--shimmer-pos, -40%) + 32%));
+  pointer-events: none;
+  animation: btn-sheen 9s ease-in-out 1.2s infinite;
+  mix-blend-mode: screen;
+}
+@keyframes btn-sheen {
+  0%, 60%, 100% { --shimmer-pos: -40%; }
+  75%           { --shimmer-pos: 140%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .btn-primary::before { animation: none; opacity: 0; }
 }
 .btn-primary:hover {
   background: var(--primary-glow);
@@ -943,37 +1076,73 @@ input[type="file"] { display: none; }
   opacity: 0.7;
 }
 
+/* ── Gallery: editorial mosaic. Tile sizes vary so it reads like a
+       photo essay, not a contact sheet. Hover-tilt suggests pinned
+       polaroids; "hero" tiles span 2 cells at rhythmic intervals. ── */
 .gallery {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 0.4rem;
+  grid-template-columns: repeat(6, 1fr);
+  grid-auto-rows: 96px;
+  grid-auto-flow: dense;
+  gap: 0.55rem;
 }
 .gallery a {
   display: block;
-  aspect-ratio: 1;
+  grid-column: span 2;
+  grid-row: span 2;
   overflow: hidden;
   background: var(--paper-edge);
   border: 0.5px solid var(--gold-fade);
+  outline: 0.5px solid color-mix(in oklab, var(--gold-fade) 50%, transparent);
+  outline-offset: 2px;
   transition: transform var(--t-base) var(--ease),
               border-color var(--t-base) var(--ease),
-              box-shadow var(--t-base) var(--ease);
+              box-shadow var(--t-base) var(--ease),
+              rotate var(--t-base) var(--ease);
   position: relative;
+  rotate: 0deg;
 }
+/* Rhythm: every 7th tile is wider (3 cols), every 11th is taller (3 rows),
+   every 13th is a "hero" landscape (4 cols × 2 rows). */
+.gallery a:nth-child(7n) { grid-column: span 3; }
+.gallery a:nth-child(11n) { grid-row: span 3; }
+.gallery a:nth-child(13n) { grid-column: span 4; grid-row: span 2; }
+.gallery a:nth-child(17n) { grid-column: span 2; grid-row: span 3; }
+
+/* Each tile sits at a slightly different angle — pinned-photo feel,
+   stable across re-renders thanks to :nth-child. */
+.gallery a:nth-child(3n+1) { rotate: -0.4deg; }
+.gallery a:nth-child(3n+2) { rotate: 0.3deg; }
+.gallery a:nth-child(5n)   { rotate: -0.2deg; }
+
 .gallery a:hover {
-  transform: translateY(-2px);
+  transform: translateY(-3px);
+  rotate: 0deg;
   border-color: var(--gold);
-  box-shadow: 0 8px 22px rgba(26, 22, 18, 0.12);
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.18), 0 4px 10px rgba(0, 0, 0, 0.08);
+  z-index: 2;
 }
 .gallery a img,
 .gallery a video {
-  transition: transform var(--t-slow) var(--ease);
+  transition: transform var(--t-slow) var(--ease), filter var(--t-base) var(--ease);
+  filter: saturate(0.95) contrast(1.02);
 }
 .gallery a:hover img,
 .gallery a:hover video {
-  transform: scale(1.04);
+  transform: scale(1.05);
+  filter: saturate(1.05) contrast(1.04);
 }
 .gallery img, .gallery video {
   width: 100%; height: 100%; object-fit: cover; display: block;
+}
+
+/* Mobile: collapse to fewer columns, less rhythm so each photo is large enough */
+@media (max-width: 639px) {
+  .gallery { grid-template-columns: repeat(4, 1fr); grid-auto-rows: 80px; gap: 0.4rem; }
+  .gallery a:nth-child(13n) { grid-column: span 4; grid-row: span 2; }
+  .gallery a:nth-child(7n) { grid-column: span 2; }
+  .gallery a:nth-child(11n) { grid-row: span 2; }
+  .gallery a:nth-child(17n) { grid-column: span 2; grid-row: span 2; }
 }
 .gallery .empty {
   grid-column: 1 / -1;
@@ -1053,35 +1222,81 @@ input[type="file"] { display: none; }
   line-height: 1;
 }
 
-/* ── Ceremony moment (post-upload reveal) ───────────────────── */
+/* ── Ceremony moment — an unrolling scroll. Hairline rule draws
+       open vertically, the gold star blooms in, the inscribed
+       Terima kasih message inks itself onto the unrolled paper. ── */
 .ceremony {
   display: none;
   text-align: center;
-  padding: 1.5rem 1rem 0.5rem;
-  animation: fade-in 280ms ease-out both;
+  padding: 2rem 1.5rem 1rem;
+  position: relative;
+  background: var(--paper-white);
+  border: 0.5px solid var(--gold-fade);
+  outline: 0.5px solid var(--gold-fade);
+  outline-offset: 6px;
+  margin: 1.5rem 0 0.5rem;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.7),
+    0 24px 60px rgba(0, 0, 0, 0.12);
+  /* Initial state: a tiny horizontal sliver in the centre */
+  clip-path: inset(50% 0 50% 0);
 }
-.ceremony.is-active { display: block; }
+.ceremony.is-active {
+  display: block;
+  animation: scroll-unfurl 900ms cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
+}
+@keyframes scroll-unfurl {
+  0%   { clip-path: inset(50% 0 50% 0); }
+  100% { clip-path: inset(0 0 0 0); }
+}
+/* Inner cargo: star, message, buttons — staggered after unfurl completes */
+.ceremony > * {
+  opacity: 0;
+  animation: rise-in 600ms var(--ease) forwards;
+}
+.ceremony.is-active > *:nth-child(1) { animation-delay: 700ms; }
+.ceremony.is-active > *:nth-child(2) { animation-delay: 900ms; }
+.ceremony.is-active > *:nth-child(3) { animation-delay: 1150ms; }
+
 .ceremony .bismillah-star {
-  width: 36px;
-  height: 36px;
-  margin: 0.5rem auto 1.1rem;
-  animation: ceremony-bloom 700ms var(--ease) both;
+  width: 40px;
+  height: 40px;
+  margin: 0.4rem auto 1.2rem;
 }
 .ceremony .ceremony-msg {
-  font-family: var(--serif);
+  font-family: var(--italic);
   font-style: italic;
-  font-size: 1.3rem;
+  font-size: 1.4rem;
   color: var(--primary);
   margin: 0;
   text-wrap: balance;
+  line-height: 1.4;
 }
-.ceremony .ceremony-sub {
-  margin-top: 1.25rem;
+.ceremony .ceremony-sub { margin-top: 1.5rem; }
+
+/* Hairline gold ruling along top and bottom edges of the scroll —
+   simulates the rod the paper rolls around. */
+.ceremony::before,
+.ceremony::after {
+  content: '';
+  position: absolute;
+  left: -3px; right: -3px;
+  height: 3px;
+  background: linear-gradient(to bottom, var(--gold), var(--gold-deep));
+  border-radius: 1.5px;
 }
-@keyframes ceremony-bloom {
-  0%   { opacity: 0; transform: scale(0.6) rotate(-12deg); }
-  60%  { opacity: 1; transform: scale(1.08) rotate(2deg); }
-  100% { opacity: 0.92; transform: scale(1) rotate(0); }
+.ceremony::before { top: -1.5px; }
+.ceremony::after  { bottom: -1.5px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ceremony.is-active {
+    animation: none;
+    clip-path: none;
+  }
+  .ceremony.is-active > * {
+    animation: none;
+    opacity: 1;
+  }
 }
 
 /* ── QR card (the showpiece) ────────────────────────────────── */
