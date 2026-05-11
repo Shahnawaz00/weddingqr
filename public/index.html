@@ -7,8 +7,42 @@
   <title>Wedding</title>
   <meta name="description" content="A celebration. Share your moments with us." />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+
+  <!-- All universe fonts in a single non-blocking preconnect + stylesheet -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="stylesheet" id="universe" href="/themes/cinema.css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Caveat:wght@400;500;600&family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Fraunces:ital,opsz,SOFT,wght@0,9..144,0..100,400;0,9..144,0..100,500;0,9..144,0..100,600;1,9..144,0..100,400&family=JetBrains+Mono:wght@400;500&family=Reem+Kufi:wght@400;500;600;700&display=swap" />
+
+  <!-- Critical anti-FOUC: paint the correct background at first paint
+       while the chosen universe stylesheet downloads. -->
+  <style>
+    html, body { margin: 0; padding: 0; min-height: 100%; font-family: 'Times New Roman', serif; }
+    body { background: #0c0a08; color: #e8dfc8; }
+    html[data-universe="manuscript"] body { background: #f3ead0; color: #14336e; }
+    html[data-universe="garden"]     body { background: #faf4ea; color: #6b3a32; }
+  </style>
+
+  <!-- Synchronous universe selection — runs before any subsequent
+       resource starts loading, so we never load and discard the wrong
+       universe stylesheet. -->
+  <script>
+    (function () {
+      var params = new URLSearchParams(location.search);
+      var urlU = params.get('theme') || params.get('universe');
+      var stored = localStorage.getItem('izzywedding-universe');
+      var AVAIL = ['cinema', 'manuscript', 'garden'];
+      var name = (urlU && AVAIL.indexOf(urlU) >= 0) ? urlU
+               : (stored && AVAIL.indexOf(stored) >= 0) ? stored
+               : 'cinema';
+      document.documentElement.setAttribute('data-universe', name);
+      var link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.id = 'universe';
+      link.href = '/themes/' + name + '.css';
+      document.head.appendChild(link);
+    })();
+  </script>
+
   <script src="/config.js"></script>
   <script src="/hijri.js"></script>
   <script src="/theme.js"></script>
@@ -28,7 +62,8 @@
         <span class="ampersand">&amp;</span>
         <span class="name" id="groomName">—</span>
       </h1>
-      <p class="meta-combined rise rise-4">
+      <p class="blessing rise rise-4" lang="ar" dir="rtl">بَارَكَ ٱللَّٰهُ لَكُمَا وَبَارَكَ عَلَيْكُمَا</p>
+      <p class="meta-combined rise rise-5">
         <span id="weddingDate">—</span><span class="sep" id="venueSep">—</span><span class="venue" id="weddingVenue">—</span>
       </p>
       <p class="meta-hijri rise rise-5" id="hijriLine"></p>
@@ -48,8 +83,7 @@
         <p class="theme-picker-label">Universe</p>
         <div class="theme-swatches">
           <button class="theme-swatch" data-theme="cinema"     aria-label="Cinema"     type="button"><span class="swatch-inner" style="--a:#0c0a08;--b:#c25a2a"></span></button>
-          <button class="theme-swatch" data-theme="editorial"  aria-label="Editorial"  type="button"><span class="swatch-inner" style="--a:#f5f1eb;--b:#5a1b3f"></span></button>
-          <button class="theme-swatch" data-theme="manuscript" aria-label="Manuscript" type="button"><span class="swatch-inner" style="--a:#f0e6cc;--b:#1a3a6e"></span></button>
+          <button class="theme-swatch" data-theme="manuscript" aria-label="Manuscript" type="button"><span class="swatch-inner" style="--a:#f3ead0;--b:#14336e"></span></button>
           <button class="theme-swatch" data-theme="garden"     aria-label="Garden"     type="button"><span class="swatch-inner" style="--a:#faf4ea;--b:#7a8b6e"></span></button>
         </div>
         <p class="theme-picker-name" id="themeName">Cinema</p>

@@ -1,57 +1,42 @@
 // ════════════════════════════════════════════════════════════════
-//  Universe system — each universe is its own complete stylesheet
-//  in /themes/. We swap the link[id="universe"] href to switch.
-//  Runs synchronously in <head> so the right universe loads before
-//  first paint (no FOUC). Wires the picker on DOMContentLoaded.
+//  Universe system — three identities (cinema, manuscript, garden).
 //
-//  Universes:
-//    cinema      — default; ink + ember + bone, monumental serif
-//    editorial   — off-white + mulberry, magazine spread
-//    manuscript  — cream + lapis + gold leaf + vermillion, illuminated
-//    garden      — cream + sage + blush, pressed-flower journal
+//  Initial universe selection happens via an inline script in each
+//  HTML <head>: it sets data-universe on <html> and appends the
+//  correct /themes/<name>.css link BEFORE any subsequent resource
+//  loads. That eliminates the FOUC on cross-page navigation.
+//
+//  This file handles only runtime: wiring the picker, swapping the
+//  active universe with a View-Transitions crossfade, persistence.
 // ════════════════════════════════════════════════════════════════
 (function () {
   const KEY = 'izzywedding-universe';
   const DEFAULT = 'cinema';
-  // All 4 universes are slotted in the picker. AVAILABLE is the subset
-  // that has a real stylesheet shipped — the rest are disabled in the
-  // picker until they land in follow-up commits.
-  const UNIVERSES = ['cinema', 'editorial', 'manuscript', 'garden'];
-  const AVAILABLE = ['cinema', 'editorial', 'manuscript', 'garden'];
+  const UNIVERSES = ['cinema', 'manuscript', 'garden'];
+  const AVAILABLE = ['cinema', 'manuscript', 'garden'];
   const NAMES = {
     cinema:     'Cinema',
-    editorial:  'Editorial',
     manuscript: 'Manuscript',
     garden:     'Garden',
   };
 
-  const urlUniverse = new URLSearchParams(location.search).get('theme')
-                   || new URLSearchParams(location.search).get('universe');
-  const stored = localStorage.getItem(KEY);
-  const initialRaw = (urlUniverse && AVAILABLE.includes(urlUniverse))
-    ? urlUniverse
-    : (stored && AVAILABLE.includes(stored) ? stored : DEFAULT);
-  const initial = initialRaw;
-
-  // Patch the universe stylesheet href before first paint
-  const setUniverse = (name) => {
-    if (!UNIVERSES.includes(name)) name = DEFAULT;
-    document.documentElement.setAttribute('data-universe', name);
-    const link = document.getElementById('universe');
-    if (link) {
-      const desired = `/themes/${name}.css`;
-      if (!link.getAttribute('href').endsWith(`/themes/${name}.css`)) {
-        link.setAttribute('href', desired);
-      }
-    }
-  };
-  setUniverse(initial);
-  if (urlUniverse) localStorage.setItem(KEY, initial);
-
   function applyUniverse(name) {
-    if (!AVAILABLE.includes(name)) return;     // ignore clicks on unbuilt universes
+    if (!AVAILABLE.includes(name)) return;
     const apply = () => {
-      setUniverse(name);
+      document.documentElement.setAttribute('data-universe', name);
+      const link = document.getElementById('universe');
+      const desired = '/themes/' + name + '.css';
+      if (link) {
+        if (!link.getAttribute('href').endsWith(desired)) {
+          link.setAttribute('href', desired);
+        }
+      } else {
+        const l = document.createElement('link');
+        l.rel = 'stylesheet';
+        l.id = 'universe';
+        l.href = desired;
+        document.head.appendChild(l);
+      }
       localStorage.setItem(KEY, name);
       const nameEl = document.getElementById('themeName');
       if (nameEl) nameEl.textContent = NAMES[name];
@@ -66,7 +51,9 @@
   function wirePicker() {
     const picker = document.querySelector('.theme-picker');
     if (!picker) return;
-    const current = localStorage.getItem(KEY) || DEFAULT;
+    const current = (document.documentElement.getAttribute('data-universe')
+                  || localStorage.getItem(KEY)
+                  || DEFAULT);
     const buttons = picker.querySelectorAll('.theme-swatch');
     const nameEl = document.getElementById('themeName');
     if (nameEl) nameEl.textContent = NAMES[current] || '';
@@ -77,7 +64,7 @@
       btn.classList.toggle('is-disabled', !isAvailable);
       if (!isAvailable) {
         btn.setAttribute('aria-disabled', 'true');
-        btn.title = `${NAMES[name]} — coming soon`;
+        btn.title = `${NAMES[name] || name} — unavailable`;
       }
       btn.addEventListener('click', () => {
         if (!isAvailable) return;

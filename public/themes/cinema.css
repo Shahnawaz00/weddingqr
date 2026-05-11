@@ -6,7 +6,9 @@
    name reveal. Zero decorative ornament. The drama is type × dark.
    ════════════════════════════════════════════════════════════════ */
 
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=Amiri:wght@400;700&family=JetBrains+Mono:wght@400;500&display=swap');
+/* Fonts are loaded from index.html via a single combined <link>.
+   No @import here — that's blocking and we now eliminate that
+   cost across universes. */
 
 @property --reveal {
   syntax: '<percentage>';
@@ -186,6 +188,7 @@ input, button, textarea { font: inherit; color: inherit; background: transparent
 /* The little bismillah-star element is unused in cinema (we use
    the rules directly). Hide it. */
 .bismillah-star { display: none; }
+.blessing { display: none; }     /* the Arabic wedding blessing is a Manuscript-only element */
 
 /* ── Eyebrow ────────────────────────────────────────────────── */
 .eyebrow-label,

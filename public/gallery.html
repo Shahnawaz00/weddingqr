@@ -6,8 +6,36 @@
   <meta name="theme-color" content="#0c0a08" />
   <title>Gallery</title>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="stylesheet" id="universe" href="/themes/cinema.css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Caveat:wght@400;500;600&family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Fraunces:ital,opsz,SOFT,wght@0,9..144,0..100,400;0,9..144,0..100,500;0,9..144,0..100,600;1,9..144,0..100,400&family=JetBrains+Mono:wght@400;500&family=Reem+Kufi:wght@400;500;600;700&display=swap" />
+
+  <style>
+    html, body { margin: 0; padding: 0; min-height: 100%; font-family: 'Times New Roman', serif; }
+    body { background: #0c0a08; color: #e8dfc8; }
+    html[data-universe="manuscript"] body { background: #f3ead0; color: #14336e; }
+    html[data-universe="garden"]     body { background: #faf4ea; color: #6b3a32; }
+  </style>
+
+  <script>
+    (function () {
+      var params = new URLSearchParams(location.search);
+      var urlU = params.get('theme') || params.get('universe');
+      var stored = localStorage.getItem('izzywedding-universe');
+      var AVAIL = ['cinema', 'manuscript', 'garden'];
+      var name = (urlU && AVAIL.indexOf(urlU) >= 0) ? urlU
+               : (stored && AVAIL.indexOf(stored) >= 0) ? stored
+               : 'cinema';
+      document.documentElement.setAttribute('data-universe', name);
+      var link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.id = 'universe';
+      link.href = '/themes/' + name + '.css';
+      document.head.appendChild(link);
+    })();
+  </script>
+
   <script src="/config.js"></script>
   <script src="/theme.js"></script>
 </head>

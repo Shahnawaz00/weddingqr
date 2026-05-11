@@ -9,7 +9,7 @@
    Mobile-first.
    ════════════════════════════════════════════════════════════════ */
 
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,SOFT,wght@0,9..144,0..100,400;0,9..144,0..100,500;0,9..144,0..100,600;1,9..144,0..100,400&family=Caveat:wght@400;500;600&family=Amiri:wght@400;700&display=swap');
+/* Fonts loaded from index.html via a single combined <link>. */
 
 :root {
   --cream:        #faf4ea;
@@ -183,6 +183,7 @@ input, button, textarea { font: inherit; color: inherit; background: transparent
   animation: garden-rise 1.6s var(--ease-soft) 500ms forwards;
 }
 .bismillah-star { display: none; }
+.blessing { display: none; }     /* Manuscript-only element */
 
 /* ── Eyebrow — handwritten script with two leaves ────────────── */
 .eyebrow-label,
