@@ -17,7 +17,7 @@
   // that has a real stylesheet shipped — the rest are disabled in the
   // picker until they land in follow-up commits.
   const UNIVERSES = ['cinema', 'editorial', 'manuscript', 'garden'];
-  const AVAILABLE = ['cinema', 'editorial'];
+  const AVAILABLE = ['cinema', 'editorial', 'manuscript'];
   const NAMES = {
     cinema:     'Cinema',
     editorial:  'Editorial',
