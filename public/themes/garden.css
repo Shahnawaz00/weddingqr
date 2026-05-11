@@ -39,7 +39,7 @@
   --ease-soft:    cubic-bezier(0.22, 0.7, 0.18, 1);
 }
 
-@view-transition { navigation: auto; }
+/* Cross-doc view transitions off — see cinema.css note. */
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html, body { margin: 0; padding: 0; min-height: 100%; }

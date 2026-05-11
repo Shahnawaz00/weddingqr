@@ -11,14 +11,18 @@
   <!-- All universe fonts in a single non-blocking preconnect + stylesheet -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Caveat:wght@400;500;600&family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Fraunces:ital,opsz,SOFT,wght@0,9..144,0..100,400;0,9..144,0..100,500;0,9..144,0..100,600;1,9..144,0..100,400&family=JetBrains+Mono:wght@400;500&family=Reem+Kufi:wght@400;500;600;700&display=swap" />
+  <!-- Google Fonts loaded NON-blocking (media=print swaps to all on
+       load) so the body paints in system fonts immediately and swaps
+       to the web faces when ready. -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Caveat:wght@400;500;600&family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Fraunces:ital,opsz,SOFT,wght@0,9..144,0..100,400;0,9..144,0..100,500;0,9..144,0..100,600;1,9..144,0..100,400&family=JetBrains+Mono:wght@400;500&family=Reem+Kufi:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'" />
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Caveat:wght@400;500;600&family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Fraunces:ital,opsz,SOFT,wght@0,9..144,0..100,400;0,9..144,0..100,500;0,9..144,0..100,600;1,9..144,0..100,400&family=JetBrains+Mono:wght@400;500&family=Reem+Kufi:wght@400;500;600;700&display=swap" /></noscript>
 
-  <!-- Critical anti-FOUC: paint the correct background at first paint
-       while the chosen universe stylesheet downloads. -->
+  <!-- Critical anti-FOUC: paint correct background + acceptable
+       fallback typography at first paint. -->
   <style>
-    html, body { margin: 0; padding: 0; min-height: 100%; font-family: 'Times New Roman', serif; }
+    html, body { margin: 0; padding: 0; min-height: 100%; font-family: 'Cormorant Garamond', 'Times New Roman', serif; }
     body { background: #0c0a08; color: #e8dfc8; }
-    html[data-universe="manuscript"] body { background: #f3ead0; color: #14336e; }
+    html[data-universe="manuscript"] body { background: #f8f4ea; color: #0e1a13; }
     html[data-universe="garden"]     body { background: #faf4ea; color: #6b3a32; }
   </style>
 
@@ -52,6 +56,7 @@
   <div class="lb-bar bottom" aria-hidden="true"></div>
 
   <div class="container">
+    <span class="bismillah-star" aria-hidden="true"></span>
     <p class="bismillah" lang="ar" dir="rtl">بِسْمِ ٱللَّٰهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ</p>
     <p class="bismillah-translit">In the name of God, the Most Gracious, the Most Merciful</p>
 

@@ -37,7 +37,8 @@
   --ease-out-cinematic: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-@view-transition { navigation: auto; }
+/* Cross-document view transitions disabled — the navigation:auto
+   transition shows the new page mid-CSS-load and reads as a flash. */
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html, body { margin: 0; padding: 0; min-height: 100%; }
@@ -75,19 +76,16 @@ body::before {
 .lb-bar {
   position: fixed;
   left: 0; right: 0;
-  /* Mobile: 7vh per bar (~50px on a 720px viewport) so the hero
-     isn't crammed between thick black bands on a phone. Desktop
-     widens to 12vh in the @media block below. */
+  /* Mobile: 7vh per bar. Desktop widens to 12vh. */
   height: 7vh;
   background: var(--ink);
   border-color: var(--ember);
   z-index: 100;
   pointer-events: none;
-  animation: lb-retract 800ms var(--ease-out-cinematic) forwards;
+  animation: lb-retract 600ms var(--ease-out-cinematic) forwards;
 }
-.lb-bar.top    { top: 0;    border-bottom: 0.5px solid var(--ember-soft); animation-delay: 200ms; }
-.lb-bar.bottom { bottom: 0; border-top:    0.5px solid var(--ember-soft); animation-delay: 200ms; transform-origin: bottom; }
-.lb-bar.top    { transform-origin: top; }
+.lb-bar.top    { top: 0;    border-bottom: 0.5px solid var(--ember-soft); animation-delay: 80ms; transform-origin: top; }
+.lb-bar.bottom { bottom: 0; border-top:    0.5px solid var(--ember-soft); animation-delay: 80ms; transform-origin: bottom; }
 @keyframes lb-retract {
   to { transform: scaleY(0); }
 }
@@ -129,16 +127,16 @@ input, button, textarea { font: inherit; color: inherit; background: transparent
 }
 
 .rise, .fade { opacity: 0; }
-.rise { animation: fade-up 900ms var(--ease-out-cinematic) forwards; }
-.fade { animation: fade-up 1.4s var(--ease-out-cinematic) forwards; }
-/* Cinematic three-beat reveal sequence — each beat 400ms apart */
-.rise-1 { animation-delay: 900ms; }
-.rise-2 { animation-delay: 1300ms; }
-.rise-3 { animation-delay: 1700ms; }
-.rise-4 { animation-delay: 2100ms; }
-.rise-5 { animation-delay: 2500ms; }
-.rise-6 { animation-delay: 2900ms; }
-.fade-late { animation-delay: 3200ms; }
+.rise { animation: fade-up 700ms var(--ease-out-cinematic) forwards; }
+.fade { animation: fade-up 1s var(--ease-out-cinematic) forwards; }
+/* Tighter cinematic reveal — ~2.4s total instead of 3.5s */
+.rise-1 { animation-delay: 600ms; }
+.rise-2 { animation-delay: 900ms; }
+.rise-3 { animation-delay: 1200ms; }
+.rise-4 { animation-delay: 1450ms; }
+.rise-5 { animation-delay: 1700ms; }
+.rise-6 { animation-delay: 2000ms; }
+.fade-late { animation-delay: 2200ms; }
 
 /* ── Bismillah — monumental Amiri, ember rules above and below ── */
 .bismillah {
@@ -155,7 +153,7 @@ input, button, textarea { font: inherit; color: inherit; background: transparent
   position: relative;
   padding: 1.5rem 1rem 1.5rem;
   opacity: 0;
-  animation: fade-up 1.4s var(--ease-out-cinematic) 600ms forwards;
+  animation: fade-up 1s var(--ease-out-cinematic) 400ms forwards;
 }
 /* Ember rules above and below — draw outward from centre */
 .bismillah::before,
@@ -168,7 +166,7 @@ input, button, textarea { font: inherit; color: inherit; background: transparent
   background: var(--ember);
   transform: scaleX(0);
   transform-origin: center;
-  animation: draw-rule 1.2s var(--ease-out-cinematic) 1100ms forwards;
+  animation: draw-rule 900ms var(--ease-out-cinematic) 800ms forwards;
 }
 .bismillah::before { top: 0; }
 .bismillah::after  { bottom: 0; }
@@ -182,7 +180,7 @@ input, button, textarea { font: inherit; color: inherit; background: transparent
   margin: 0.5rem 0 4rem;
   text-transform: uppercase;
   opacity: 0;
-  animation: fade-up 1.4s var(--ease-out-cinematic) 1400ms forwards;
+  animation: fade-up 1s var(--ease-out-cinematic) 950ms forwards;
 }
 
 /* The little bismillah-star element is unused in cinema (we use
@@ -229,10 +227,10 @@ input, button, textarea { font: inherit; color: inherit; background: transparent
 .hero h1 .name {
   display: block;
   opacity: 0;
-  animation: wipe-in 900ms var(--ease-out-cinematic) forwards;
+  animation: wipe-in 700ms var(--ease-out-cinematic) forwards;
 }
-.hero h1 .name:nth-of-type(1) { animation-delay: 1700ms; }
-.hero h1 .name:nth-of-type(2) { animation-delay: 2500ms; }
+.hero h1 .name:nth-of-type(1) { animation-delay: 1200ms; }
+.hero h1 .name:nth-of-type(2) { animation-delay: 1700ms; }
 /* Ampersand — small, ember, italic — beat between the names */
 .hero h1 .ampersand {
   display: block;
@@ -245,7 +243,7 @@ input, button, textarea { font: inherit; color: inherit; background: transparent
   margin: 0.4em 0;
   letter-spacing: 0;
   opacity: 0;
-  animation: fade-up 700ms var(--ease-out-cinematic) 2200ms forwards;
+  animation: fade-up 600ms var(--ease-out-cinematic) 1500ms forwards;
 }
 
 /* Compact hero (upload/gallery/qr pages) — smaller cinematic hold */
@@ -256,14 +254,14 @@ input, button, textarea { font: inherit; color: inherit; background: transparent
 }
 .hero h1.compact .name {
   display: inline;
-  animation-delay: 600ms;
+  animation-delay: 400ms;
 }
-.hero h1.compact .name:nth-of-type(2) { animation-delay: 1200ms; }
+.hero h1.compact .name:nth-of-type(2) { animation-delay: 800ms; }
 .hero h1.compact .ampersand {
   display: inline;
   font-size: 0.7em;
   margin: 0 0.25em;
-  animation-delay: 900ms;
+  animation-delay: 600ms;
 }
 
 /* ── Meta line: date · venue ────────────────────────────────── */
@@ -341,7 +339,7 @@ input, button, textarea { font: inherit; color: inherit; background: transparent
   height: 1px;
   background: var(--ember);
   transform: scaleX(0);
-  animation: draw-rule 1.4s var(--ease-out-cinematic) 1000ms forwards;
+  animation: draw-rule 1s var(--ease-out-cinematic) 700ms forwards;
 }
 .rule-diamond .ornament,
 .rule-diamond > svg { display: none; }
