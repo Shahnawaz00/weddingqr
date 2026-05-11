@@ -47,7 +47,20 @@
   --ease:         cubic-bezier(0.22, 0.7, 0.18, 1);
 }
 
-/* Cross-doc view transitions off — see cinema.css note. */
+/* ── Cross-doc page transitions — subtle page-turn rise ─────── */
+@view-transition { navigation: auto; }
+::view-transition-old(root) {
+  animation: ms-out 700ms cubic-bezier(0.22, 0.7, 0.18, 1) both;
+}
+::view-transition-new(root) {
+  animation: ms-in 900ms cubic-bezier(0.22, 0.7, 0.18, 1) both;
+}
+@keyframes ms-out {
+  to { opacity: 0; transform: translateY(-14px) scale(0.992); }
+}
+@keyframes ms-in {
+  from { opacity: 0; transform: translateY(18px) scale(1.008); }
+}
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html, body { margin: 0; padding: 0; min-height: 100%; }
@@ -77,9 +90,40 @@ input, button, textarea { font: inherit; color: inherit; background: transparent
 
 .lb-bar { display: none; }
 
+/* ── Slow sunbeam — a soft diagonal of warm gold light sweeps
+       across the page over ~36s. Evokes a sunbeam through a
+       mosque window slowly moving with the hour. Pure
+       transform/opacity for GPU performance. */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image: linear-gradient(115deg,
+    transparent 32%,
+    rgba(200, 154, 58, 0.06) 44%,
+    rgba(227, 185, 92, 0.14) 50%,
+    rgba(200, 154, 58, 0.06) 56%,
+    transparent 68%);
+  background-size: 280% 100%;
+  background-position: 110% 50%;
+  background-repeat: no-repeat;
+  animation: ms-sunbeam 36s linear infinite;
+  will-change: background-position;
+}
+@keyframes ms-sunbeam {
+  0%   { background-position: 110% 50%; }
+  100% { background-position: -50% 50%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  body::after { animation: none; opacity: 0.6; }
+}
+
 /* ── Layout ─────────────────────────────────────────────────── */
 .container {
   position: relative;
+  z-index: 1;          /* sit above the sunbeam atmosphere */
   max-width: var(--measure);
   margin: 0 auto;
   padding: 3rem var(--pad) 4rem;
@@ -195,14 +239,16 @@ input, button, textarea { font: inherit; color: inherit; background: transparent
 }
 .hero h1 {
   font-family: var(--display);
-  font-weight: 500;
+  font-weight: 600;
   color: var(--ink);
   margin: 0;
-  line-height: 1.1;
-  letter-spacing: 0.08em;
-  font-size: clamp(2.6rem, 11vw, 4.5rem);
+  line-height: 1.02;
+  letter-spacing: 0.04em;
+  /* Cinzel monumental — names dominate the composition. Mobile gets
+     ~75–80px on a 400px viewport; desktop caps at 7.5rem. */
+  font-size: clamp(3.8rem, 19vw, 7.5rem);
   text-transform: uppercase;
-  padding-left: 0.08em;
+  padding-left: 0.04em;
   overflow-wrap: anywhere;
 }
 .hero h1 .name {
@@ -217,8 +263,9 @@ input, button, textarea { font: inherit; color: inherit; background: transparent
   display: block;
   font-size: 0;
   line-height: 0;
-  height: clamp(2.2rem, 7vw, 3rem);
-  margin: 0.15em 0;
+  /* ~40% of name size so it sits as a subordinate joining mark */
+  height: clamp(2rem, 9vw, 3.6rem);
+  margin: 0.18em 0;
   opacity: 0;
   animation: ms-bloom 700ms var(--ease) 900ms forwards;
 }
@@ -226,7 +273,7 @@ input, button, textarea { font: inherit; color: inherit; background: transparent
   content: 'و';
   font-family: var(--arabic-display);
   font-weight: 600;
-  font-size: clamp(2rem, 7vw, 3rem);
+  font-size: clamp(2rem, 9vw, 3.6rem);
   line-height: 1;
   color: var(--gold);
   display: inline-block;

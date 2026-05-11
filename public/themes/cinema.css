@@ -37,8 +37,25 @@
   --ease-out-cinematic: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Cross-document view transitions disabled — the navigation:auto
-   transition shows the new page mid-CSS-load and reads as a flash. */
+/* ── Cross-document page transitions — fade through ink ──────
+   The previous FOUC was actually JS-appended <link> not being
+   render-blocking. Now that the universe link is injected via
+   document.write (parse-time, blocking), we can re-enable the
+   transitions. The new page is fully styled before the transition
+   starts. ────────────────────────────────────────────────── */
+@view-transition { navigation: auto; }
+::view-transition-old(root) {
+  animation: cinema-out 600ms cubic-bezier(0.4, 0, 1, 1) both;
+}
+::view-transition-new(root) {
+  animation: cinema-in 800ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes cinema-out {
+  to { opacity: 0; transform: scale(0.96); filter: brightness(0.3) blur(6px); }
+}
+@keyframes cinema-in {
+  from { opacity: 0; transform: scale(1.04); filter: brightness(0.3) blur(6px); }
+}
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html, body { margin: 0; padding: 0; min-height: 100%; }
@@ -70,6 +87,31 @@ body::before {
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='320' height='320'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 0.96  0 0 0 0 0.86  0 0 0 0.07 0'/></filter><rect width='320' height='320' filter='url(%23g)'/></svg>");
   opacity: 0.55;
   mix-blend-mode: screen;
+}
+
+/* Breathing ember glow — two soft radial pools that slowly pulse
+   like ambient projection booth light hitting the wall. Subtle:
+   max opacity 1.0 against the ink bg, alpha 0.18 on the gradients
+   themselves. */
+body > .atmosphere,
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image:
+    radial-gradient(60vw 50vw at 18% 22%, rgba(194, 90, 42, 0.20), transparent 65%),
+    radial-gradient(55vw 45vw at 82% 80%, rgba(216, 112, 62, 0.16), transparent 60%);
+  animation: ember-breathe 14s ease-in-out infinite;
+  will-change: opacity;
+}
+@keyframes ember-breathe {
+  0%, 100% { opacity: 0.55; }
+  50%      { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  body::after { animation: none; opacity: 0.7; }
 }
 
 /* Letterbox bars — present at page load, retract over 800ms */
@@ -210,18 +252,17 @@ input, button, textarea { font: inherit; color: inherit; background: transparent
 }
 .hero h1 {
   font-family: var(--display);
-  font-weight: 600;
-  font-variation-settings: "opsz" 144, "SOFT" 30;
+  font-weight: 700;
+  font-variation-settings: "opsz" 144, "SOFT" 20;
   font-optical-sizing: auto;
   color: var(--bone);
   margin: 0;
-  line-height: 0.92;
-  letter-spacing: -0.025em;
-  /* Mobile-first: smaller floor so short names breathe on a 360px
-     viewport and don't push siblings off-screen. Desktop scales up. */
-  font-size: clamp(3.5rem, 18vw, 9rem);
+  line-height: 0.88;
+  letter-spacing: -0.035em;
+  /* Dominate the viewport — names are the visual hero. Mobile gets
+     22vw (≈85px on 390px); desktop caps at 12rem. */
+  font-size: clamp(4.5rem, 22vw, 12rem);
   text-shadow: 0 0 32px rgba(232, 223, 200, 0.04);
-  /* Guard against any name accidentally overflowing the viewport */
   overflow-wrap: anywhere;
 }
 .hero h1 .name {

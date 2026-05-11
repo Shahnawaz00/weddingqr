@@ -30,6 +30,11 @@
        resource starts loading, so we never load and discard the wrong
        universe stylesheet. -->
   <script>
+    // Synchronous universe selection. We use document.write here on
+    // purpose: dynamically-appended <link> tags are NOT render-blocking
+    // in most browsers, which lets the page paint before the universe
+    // CSS loads (the FOUC the user was seeing). document.write inserts
+    // the link at parse time, which IS render-blocking.
     (function () {
       var params = new URLSearchParams(location.search);
       var urlU = params.get('theme') || params.get('universe');
@@ -39,11 +44,7 @@
                : (stored && AVAIL.indexOf(stored) >= 0) ? stored
                : 'cinema';
       document.documentElement.setAttribute('data-universe', name);
-      var link = document.createElement('link');
-      link.rel = 'stylesheet';
-      link.id = 'universe';
-      link.href = '/themes/' + name + '.css';
-      document.head.appendChild(link);
+      document.write('<link rel="stylesheet" id="universe" href="/themes/' + name + '.css">');
     })();
   </script>
 

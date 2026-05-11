@@ -29,11 +29,7 @@
                : (stored && AVAIL.indexOf(stored) >= 0) ? stored
                : 'cinema';
       document.documentElement.setAttribute('data-universe', name);
-      var link = document.createElement('link');
-      link.rel = 'stylesheet';
-      link.id = 'universe';
-      link.href = '/themes/' + name + '.css';
-      document.head.appendChild(link);
+      document.write('<link rel="stylesheet" id="universe" href="/themes/' + name + '.css">');
     })();
   </script>
 
