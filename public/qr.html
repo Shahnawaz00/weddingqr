@@ -3,18 +3,20 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#163b2e" />
+  <meta name="theme-color" content="#0c0a08" />
   <title>Scan to share</title>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="stylesheet" href="/style.css" />
+  <link rel="stylesheet" id="universe" href="/themes/cinema.css" />
   <script src="/config.js"></script>
   <script src="/hijri.js"></script>
   <script src="/theme.js"></script>
-  <!-- qrcodejs by davidshimjs — pure-browser, no build step. -->
   <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs@04f46c6/qrcode.min.js"></script>
 </head>
 <body>
+  <div class="lb-bar top no-print" aria-hidden="true"></div>
+  <div class="lb-bar bottom no-print" aria-hidden="true"></div>
+
   <div class="container">
     <div class="qr-stage fade">
       <div class="qr-card">
@@ -27,10 +29,6 @@
 
         <h2><span id="brideName">—</span><span class="ampersand">&amp;</span><span id="groomName">—</span></h2>
 
-        <div class="rule-diamond" aria-hidden="true" style="margin: 1.4rem 0 0.4rem;">
-          <span class="ornament"></span>
-        </div>
-
         <p class="scan-prompt" id="prompt">Scan to share your moments</p>
 
         <div class="qr-frame" id="qrcode" aria-label="QR code"></div>
@@ -38,9 +36,6 @@
         <p class="visit-label">or visit</p>
         <p class="visit-url" id="qrUrl"></p>
 
-        <div class="seal-wrap" aria-hidden="true">
-          <img class="seal" src="/monogram.svg" alt="" />
-        </div>
         <p class="stamp" id="stamp">—</p>
         <p class="stamp-hijri" id="stampHijri"></p>
       </div>
@@ -48,7 +43,7 @@
 
     <div class="btn-row no-print">
       <button class="btn btn-primary" onclick="window.print()">Print this card</button>
-      <a class="link-elegant" href="/">← Back home</a>
+      <a class="link-elegant" href="/">Back home</a>
     </div>
   </div>
 
@@ -63,49 +58,37 @@
     const venue   = (c.venue || '').toUpperCase();
     document.getElementById('stamp').textContent = [dateStr, venue].filter(Boolean).join('  ·  ');
 
-    // Hijri line (auto-compute or override)
     const hijriEl = document.getElementById('stampHijri');
-    if (c.hijriDate) {
-      hijriEl.textContent = c.hijriDate.toUpperCase();
-    } else if (c.date && window.Hijri) {
-      hijriEl.textContent = window.Hijri.formatHijri(new Date(c.date));
-    } else {
-      hijriEl.style.display = 'none';
-    }
+    if (c.hijriDate) hijriEl.textContent = c.hijriDate.toUpperCase();
+    else if (c.date && window.Hijri) hijriEl.textContent = window.Hijri.formatHijri(new Date(c.date));
+    else hijriEl.style.display = 'none';
 
     const uploadUrl = `${window.location.origin}/upload.html`;
     document.getElementById('qrUrl').textContent = uploadUrl;
 
-    // Read theme's primary ink colour so the QR matches whichever theme is active.
-    const themeDark = getComputedStyle(document.documentElement)
-      .getPropertyValue('--primary').trim() || '#163b2e';
+    // QR colour follows the active universe's primary ink (cinema=#0c0a08)
+    const themeDark = getComputedStyle(document.documentElement).getPropertyValue('--ink').trim() || '#0c0a08';
 
     new QRCode(document.getElementById('qrcode'), {
       text: uploadUrl,
-      width: 240,
-      height: 240,
-      colorDark:  themeDark,
-      colorLight: '#ffffff',
+      width: 240, height: 240,
+      colorDark: themeDark, colorLight: '#ffffff',
       correctLevel: QRCode.CorrectLevel.M,
     });
 
-    // ── Print 2-up via ?per=2 ────────────────────────────────
     const params = new URLSearchParams(window.location.search);
     if (params.get('per') === '2') {
       document.body.classList.add('print-2up');
       const card = document.querySelector('.qr-card');
       const clone = card.cloneNode(true);
-      // Re-render QR into the cloned container (cloneNode copies HTML, not canvas pixels)
       const cloneQrEl = clone.querySelector('#qrcode');
       cloneQrEl.id = 'qrcode-clone';
       cloneQrEl.innerHTML = '';
       card.parentNode.appendChild(clone);
       new QRCode(cloneQrEl, {
         text: uploadUrl,
-        width: 240,
-        height: 240,
-        colorDark:  themeDark,
-        colorLight: '#ffffff',
+        width: 240, height: 240,
+        colorDark: themeDark, colorLight: '#ffffff',
         correctLevel: QRCode.CorrectLevel.M,
       });
     }

@@ -3,47 +3,43 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#163b2e" />
+  <meta name="theme-color" content="#0c0a08" />
   <title>Gallery</title>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="stylesheet" href="/style.css" />
+  <link rel="stylesheet" id="universe" href="/themes/cinema.css" />
   <script src="/config.js"></script>
   <script src="/theme.js"></script>
 </head>
 <body>
+  <div class="lb-bar top" aria-hidden="true"></div>
+  <div class="lb-bar bottom" aria-hidden="true"></div>
+
   <div class="container">
-    <div class="hero" style="padding-bottom: 0.5rem;">
+    <div class="hero" style="padding-bottom: 0;">
       <h1 class="compact">
         <span class="name" id="brideTop">—</span><span class="ampersand">&amp;</span><span class="name" id="groomTop">—</span>
       </h1>
     </div>
 
-    <div class="rule-diamond" aria-hidden="true">
-      <span class="ornament"></span>
-    </div>
-
     <p class="eyebrow">A collection of your moments</p>
 
-    <div class="card">
-      <div class="gallery-filters" id="filters"></div>
-      <div class="gallery" id="gallery">
-        <span class="skeleton" aria-hidden="true"></span>
-        <span class="skeleton" aria-hidden="true"></span>
-        <span class="skeleton" aria-hidden="true"></span>
-        <span class="skeleton" aria-hidden="true"></span>
-        <span class="skeleton" aria-hidden="true"></span>
-        <span class="skeleton" aria-hidden="true"></span>
-      </div>
+    <div class="gallery-filters" id="filters"></div>
+    <div class="gallery" id="gallery">
+      <span class="skeleton" aria-hidden="true"></span>
+      <span class="skeleton" aria-hidden="true"></span>
+      <span class="skeleton" aria-hidden="true"></span>
+      <span class="skeleton" aria-hidden="true"></span>
+      <span class="skeleton" aria-hidden="true"></span>
+      <span class="skeleton" aria-hidden="true"></span>
     </div>
 
     <div class="btn-row">
       <a class="btn btn-primary" href="/upload.html">Add a moment</a>
-      <a class="link-elegant" href="/">← Home</a>
+      <a class="link-elegant" href="/">Home</a>
     </div>
   </div>
 
-  <!-- In-page lightbox: thumb morphs into hero via shared view-transition-name -->
   <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Photo viewer">
     <button class="lb-close" id="lbClose" type="button" aria-label="Close">×</button>
     <div id="lbContent"></div>
@@ -64,15 +60,12 @@
     let allPhotos = [];
     let active = 'all';
 
-    // Stable id from URL so the same thumb gets the same view-transition-name across renders
     function vtNameFor(p) {
       const base = (p.url || p.key || '').replace(/[^a-zA-Z0-9]/g, '_');
       return `photo_${base.slice(-40)}`;
     }
-
     function openLightbox(photo, sourceEl) {
       const sourceVtName = sourceEl.style.viewTransitionName;
-
       const show = () => {
         lbContent.innerHTML = '';
         const el = photo.isVideo
@@ -82,58 +75,38 @@
         lbContent.appendChild(el);
         lightbox.classList.add('is-open');
       };
-
       if (document.startViewTransition && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
         document.startViewTransition(show);
-      } else {
-        show();
-      }
+      } else { show(); }
     }
-
     function closeLightbox() {
       const el = lbContent.firstElementChild;
-      const close = () => {
-        lightbox.classList.remove('is-open');
-        lbContent.innerHTML = '';
-      };
+      const close = () => { lightbox.classList.remove('is-open'); lbContent.innerHTML = ''; };
       if (el && document.startViewTransition && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
         document.startViewTransition(close);
-      } else {
-        close();
-      }
+      } else { close(); }
     }
-
     lbClose.addEventListener('click', closeLightbox);
     lightbox.addEventListener('click', (e) => { if (e.target === lightbox) closeLightbox(); });
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && lightbox.classList.contains('is-open')) closeLightbox(); });
 
     function render() {
       gallery.innerHTML = '';
-      const visible = active === 'all'
-        ? allPhotos
-        : allPhotos.filter((p) => p.event === active);
-
+      const visible = active === 'all' ? allPhotos : allPhotos.filter((p) => p.event === active);
       if (visible.length === 0) {
         const empty = document.createElement('div');
         empty.className = 'empty';
-        if (active === 'all') {
-          empty.textContent = 'No moments yet — be the first to share.';
-        } else {
-          empty.textContent = 'No moments in this album yet.';
-        }
+        empty.textContent = active === 'all'
+          ? 'No moments yet — be the first to share.'
+          : 'No moments in this album yet.';
         gallery.appendChild(empty);
         return;
       }
-
       visible.forEach((p) => {
         const a = document.createElement('a');
         a.href = p.url; a.target = '_blank'; a.rel = 'noopener';
         a.style.viewTransitionName = vtNameFor(p);
-        a.addEventListener('click', (e) => {
-          // Lightbox in-page; bypass new tab
-          e.preventDefault();
-          openLightbox(p, a);
-        });
+        a.addEventListener('click', (e) => { e.preventDefault(); openLightbox(p, a); });
         if (p.isVideo) {
           const v = document.createElement('video');
           v.src = p.url; v.muted = true; v.playsInline = true; v.preload = 'metadata';
@@ -151,7 +124,6 @@
       filtersEl.innerHTML = '';
       const counts = { all: allPhotos.length };
       allPhotos.forEach((p) => { counts[p.event] = (counts[p.event] || 0) + 1; });
-
       const mkChip = (slug, label) => {
         const btn = document.createElement('button');
         btn.type = 'button';
@@ -160,13 +132,9 @@
         btn.addEventListener('click', () => { active = slug; buildFilters(); render(); });
         return btn;
       };
-
       filtersEl.appendChild(mkChip('all', 'All'));
       const seen = new Set();
-      events.forEach((ev) => {
-        seen.add(ev.slug);
-        filtersEl.appendChild(mkChip(ev.slug, ev.label));
-      });
+      events.forEach((ev) => { seen.add(ev.slug); filtersEl.appendChild(mkChip(ev.slug, ev.label)); });
       Object.keys(counts).forEach((slug) => {
         if (slug === 'all' || seen.has(slug)) return;
         filtersEl.appendChild(mkChip(slug, slug));
@@ -175,11 +143,7 @@
 
     fetch('/api/photos')
       .then((r) => r.json())
-      .then((data) => {
-        allPhotos = (data.ok && data.photos) || [];
-        buildFilters();
-        render();
-      })
+      .then((data) => { allPhotos = (data.ok && data.photos) || []; buildFilters(); render(); })
       .catch(() => {
         gallery.innerHTML = '';
         const empty = document.createElement('div');

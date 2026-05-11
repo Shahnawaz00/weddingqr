@@ -3,47 +3,39 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#163b2e" />
+  <meta name="theme-color" content="#0c0a08" />
   <title>Wedding</title>
   <meta name="description" content="A celebration. Share your moments with us." />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="stylesheet" href="/style.css" />
+  <link rel="stylesheet" id="universe" href="/themes/cinema.css" />
   <script src="/config.js"></script>
   <script src="/hijri.js"></script>
   <script src="/theme.js"></script>
 </head>
 <body>
-  <div class="container">
-    <span class="bismillah-star rise rise-1" aria-hidden="true"></span>
+  <div class="lb-bar top" aria-hidden="true"></div>
+  <div class="lb-bar bottom" aria-hidden="true"></div>
 
-    <p class="bismillah rise rise-2" lang="ar" dir="rtl">بِسْمِ ٱللَّٰهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ</p>
-    <p class="bismillah-translit fade">In the name of God, the Most Gracious, the Most Merciful</p>
+  <div class="container">
+    <p class="bismillah" lang="ar" dir="rtl">بِسْمِ ٱللَّٰهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ</p>
+    <p class="bismillah-translit">In the name of God, the Most Gracious, the Most Merciful</p>
 
     <div class="hero">
-      <p class="eyebrow-label rise rise-2">The Wedding Of</p>
-
-      <h1 class="rise rise-3">
+      <p class="eyebrow-label fade">The Wedding Of</p>
+      <h1>
         <span class="name" id="brideName">—</span>
         <span class="ampersand">&amp;</span>
         <span class="name" id="groomName">—</span>
       </h1>
-
-      <div class="rule-diamond rise rise-4" aria-hidden="true">
-        <span class="ornament"></span>
-      </div>
-
-      <p class="meta-combined rise rise-5">
+      <p class="meta-combined rise rise-4">
         <span id="weddingDate">—</span><span class="sep" id="venueSep">—</span><span class="venue" id="weddingVenue">—</span>
       </p>
-
       <p class="meta-hijri rise rise-5" id="hijriLine"></p>
-
       <p class="tagline rise rise-6" id="tagline">—</p>
-
       <div class="btn-row rise rise-6">
         <a class="btn btn-primary" href="/upload.html">Add a moment</a>
-        <a class="link-elegant" href="/gallery.html">View the gallery →</a>
+        <a class="link-elegant" href="/gallery.html">View the gallery</a>
       </div>
     </div>
 
@@ -52,23 +44,15 @@
       <p class="hashtag" id="hashtag"></p>
       <a class="meta-link" href="/qr.html">Print QR card</a>
 
-      <div class="theme-picker no-print" aria-label="Theme preview">
-        <p class="theme-picker-label">Themes</p>
+      <div class="theme-picker no-print" aria-label="Universe">
+        <p class="theme-picker-label">Universe</p>
         <div class="theme-swatches">
-          <button class="theme-swatch" data-theme="default" data-name="Engraved Emerald" aria-label="Engraved Emerald" type="button">
-            <span class="swatch-inner" style="--a:#163b2e;--b:#a7823c;--ornament:url('data:image/svg+xml;utf8,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 12 12%22&gt;&lt;g fill=%22black%22&gt;&lt;rect x=%225.4%22 y=%222.5%22 width=%221.2%22 height=%227%22/&gt;&lt;rect x=%225.4%22 y=%222.5%22 width=%221.2%22 height=%227%22 transform=%22rotate(45 6 6)%22/&gt;&lt;/g&gt;&lt;/svg&gt;')"></span>
-          </button>
-          <button class="theme-swatch" data-theme="midnight" data-name="Midnight Ivory" aria-label="Midnight Ivory" type="button">
-            <span class="swatch-inner" style="--a:#122b4a;--b:#b8995a;--ornament:url('data:image/svg+xml;utf8,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 14 14%22&gt;&lt;g fill=%22black%22&gt;&lt;path d=%22M9.2 7 A 3.7 3.7 0 1 1 5.6 3.4 A 2.9 2.9 0 1 0 9.2 7 Z%22/&gt;&lt;path d=%22M11.8 2.4 L12.15 3.5 L13.3 3.5 L12.4 4.2 L12.75 5.3 L11.8 4.6 L10.85 5.3 L11.2 4.2 L10.3 3.5 L11.45 3.5 Z%22/&gt;&lt;/g&gt;&lt;/svg&gt;')"></span>
-          </button>
-          <button class="theme-swatch" data-theme="rose" data-name="Mughal Rose" aria-label="Mughal Rose" type="button">
-            <span class="swatch-inner" style="--a:#5c1f30;--b:#b88565;--ornament:url('data:image/svg+xml;utf8,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 14 14%22&gt;&lt;g fill=%22black%22&gt;&lt;path d=%22M7 1.5 C 8.6 1.5 8.6 5.2 7 5.2 C 5.4 5.2 5.4 1.5 7 1.5 Z%22/&gt;&lt;path d=%22M7 12.5 C 8.6 12.5 8.6 8.8 7 8.8 C 5.4 8.8 5.4 12.5 7 12.5 Z%22/&gt;&lt;path d=%22M1.5 7 C 1.5 8.6 5.2 8.6 5.2 7 C 5.2 5.4 1.5 5.4 1.5 7 Z%22/&gt;&lt;path d=%22M12.5 7 C 12.5 8.6 8.8 8.6 8.8 7 C 8.8 5.4 12.5 5.4 12.5 7 Z%22/&gt;&lt;circle cx=%227%22 cy=%227%22 r=%221.05%22/&gt;&lt;/g&gt;&lt;/svg&gt;')"></span>
-          </button>
-          <button class="theme-swatch" data-theme="bronze" data-name="Desert Bronze" aria-label="Desert Bronze" type="button">
-            <span class="swatch-inner" style="--a:#4a4d2a;--b:#92733e;--ornament:url('data:image/svg+xml;utf8,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 14 14%22&gt;&lt;g fill=%22black%22&gt;&lt;circle cx=%227%22 cy=%227%22 r=%221.6%22/&gt;&lt;rect x=%226.6%22 y=%220.5%22 width=%220.8%22 height=%222.6%22/&gt;&lt;rect x=%226.6%22 y=%2210.9%22 width=%220.8%22 height=%222.6%22/&gt;&lt;rect x=%220.5%22 y=%226.6%22 width=%222.6%22 height=%220.8%22/&gt;&lt;rect x=%2210.9%22 y=%226.6%22 width=%222.6%22 height=%220.8%22/&gt;&lt;/g&gt;&lt;/svg&gt;')"></span>
-          </button>
+          <button class="theme-swatch" data-theme="cinema"     aria-label="Cinema"     type="button"><span class="swatch-inner" style="--a:#0c0a08;--b:#c25a2a"></span></button>
+          <button class="theme-swatch" data-theme="editorial"  aria-label="Editorial"  type="button"><span class="swatch-inner" style="--a:#f5f1eb;--b:#5a1b3f"></span></button>
+          <button class="theme-swatch" data-theme="manuscript" aria-label="Manuscript" type="button"><span class="swatch-inner" style="--a:#f0e6cc;--b:#1a3a6e"></span></button>
+          <button class="theme-swatch" data-theme="garden"     aria-label="Garden"     type="button"><span class="swatch-inner" style="--a:#faf4ea;--b:#7a8b6e"></span></button>
         </div>
-        <p class="theme-picker-name" id="themeName">Engraved Emerald</p>
+        <p class="theme-picker-name" id="themeName">Cinema</p>
       </div>
     </div>
   </div>
@@ -84,21 +68,15 @@
     document.getElementById('weddingDate').textContent = dateText;
     document.getElementById('weddingVenue').textContent = venueText;
     const sep = document.getElementById('venueSep');
-    if (dateText && venueText) sep.textContent = '—';
+    if (dateText && venueText) sep.textContent = '·';
     else sep.style.display = 'none';
     document.getElementById('tagline').textContent = c.tagline || '';
     document.getElementById('hashtag').textContent = c.hashtag || '';
 
     const hijriEl = document.getElementById('hijriLine');
-    if (c.hijriDate) {
-      hijriEl.textContent = c.hijriDate.toUpperCase();
-    } else if (c.date && window.Hijri) {
-      const d = new Date(c.date);
-      const formatted = window.Hijri.formatHijri(d);
-      hijriEl.textContent = formatted;
-    } else {
-      hijriEl.style.display = 'none';
-    }
+    if (c.hijriDate) hijriEl.textContent = c.hijriDate.toUpperCase();
+    else if (c.date && window.Hijri) hijriEl.textContent = window.Hijri.formatHijri(new Date(c.date));
+    else hijriEl.style.display = 'none';
 
     function formatDate(s) {
       if (!s) return '';

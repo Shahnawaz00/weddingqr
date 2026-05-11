@@ -3,24 +3,23 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#163b2e" />
+  <meta name="theme-color" content="#0c0a08" />
   <title>Add a moment</title>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="stylesheet" href="/style.css" />
+  <link rel="stylesheet" id="universe" href="/themes/cinema.css" />
   <script src="/config.js"></script>
   <script src="/theme.js"></script>
 </head>
 <body>
+  <div class="lb-bar top" aria-hidden="true"></div>
+  <div class="lb-bar bottom" aria-hidden="true"></div>
+
   <div class="container has-sticky">
-    <div class="hero" style="padding-bottom: 0.5rem;">
+    <div class="hero" style="padding-bottom: 0;">
       <h1 class="compact">
         <span class="name" id="brideTop">—</span><span class="ampersand">&amp;</span><span class="name" id="groomTop">—</span>
       </h1>
-    </div>
-
-    <div class="rule-diamond" aria-hidden="true">
-      <span class="ornament"></span>
     </div>
 
     <p class="italic-prompt" id="prompt">—</p>
@@ -51,7 +50,7 @@
 
       <div class="btn-row desktop-only-cta">
         <button class="btn btn-primary" id="uploadBtnDesktop" disabled>Send these home</button>
-        <a class="link-elegant" href="/gallery.html">View the gallery →</a>
+        <a class="link-elegant" href="/gallery.html">View the gallery</a>
       </div>
 
       <div class="btn-row" id="retryRow" style="display:none;">
@@ -59,22 +58,20 @@
       </div>
     </div>
 
-    <!-- Ceremony moment — replaces the card on success -->
     <div class="ceremony" id="ceremony" aria-live="polite">
       <span class="bismillah-star" aria-hidden="true"></span>
       <p class="ceremony-msg" id="ceremonyMsg">Terima kasih — your moment is with us.</p>
       <div class="btn-row ceremony-sub">
         <a class="btn btn-primary" href="/gallery.html">View what's been shared</a>
-        <button class="link-elegant" type="button" id="addMoreBtn">Add another →</button>
+        <button class="link-elegant" type="button" id="addMoreBtn">Add another</button>
       </div>
     </div>
 
     <div style="text-align:center;">
-      <a class="back-link" href="/">← Back home</a>
+      <a class="back-link" href="/">Back home</a>
     </div>
   </div>
 
-  <!-- Sticky bottom CTA — slides in once files are selected (mobile) -->
   <div class="sticky-cta" id="stickyCta">
     <button class="btn btn-primary" id="uploadBtn" disabled>Send these home</button>
   </div>
@@ -85,15 +82,6 @@
     document.getElementById('groomTop').textContent = c.groomName || '';
     document.getElementById('prompt').textContent = c.uploadPrompt || '';
     document.title = `Add a moment — ${c.brideName} & ${c.groomName}`;
-
-    // ── Chip ornaments per event slug ──────────────────────
-    const ORNAMENTS = {
-      'berinai': '<svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="0.85" stroke-linecap="round" stroke-linejoin="round"><path d="M7 12.5 Q 3.6 9 3.6 6 Q 3.6 2.6 7 1.5 Q 10.4 2.6 10.4 6 Q 10.4 9 7 12.5 Z"/><line x1="7" y1="2" x2="7" y2="12" opacity="0.45"/></svg>',
-      'akad-nikah': '<svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="0.95"><circle cx="5" cy="7" r="2.9"/><circle cx="9" cy="7" r="2.9"/></svg>',
-      'bersanding': '<svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="0.85" stroke-linecap="round" stroke-linejoin="round"><path d="M2.4 11 L 2.4 5.4 Q 2.4 3.2 4.6 3.2 L 9.4 3.2 Q 11.6 3.2 11.6 5.4 L 11.6 11"/><line x1="1.5" y1="11.4" x2="12.5" y2="11.4"/><line x1="2.4" y1="7.4" x2="11.6" y2="7.4"/></svg>',
-      'lain-lain': '<svg viewBox="0 0 14 14" fill="currentColor"><ellipse cx="7" cy="3.4" rx="0.95" ry="2.2"/><ellipse cx="7" cy="10.6" rx="0.95" ry="2.2"/><ellipse cx="3.4" cy="7" rx="2.2" ry="0.95"/><ellipse cx="10.6" cy="7" rx="2.2" ry="0.95"/><circle cx="7" cy="7" r="0.9"/></svg>',
-    };
-    const DEFAULT_ORNAMENT = ORNAMENTS['lain-lain'];
 
     const events = Array.isArray(c.events) ? c.events : [];
     if (events.length > 0) {
@@ -106,11 +94,6 @@
         if (i === 0) input.checked = true;
         const label = document.createElement('label');
         label.htmlFor = id;
-        const orn = document.createElement('span');
-        orn.className = 'chip-ornament';
-        orn.setAttribute('aria-hidden', 'true');
-        orn.innerHTML = ORNAMENTS[ev.slug] || DEFAULT_ORNAMENT;
-        label.appendChild(orn);
         label.appendChild(document.createTextNode(ev.label));
         picker.appendChild(input);
         picker.appendChild(label);
@@ -139,9 +122,7 @@
     const addMoreBtn = document.getElementById('addMoreBtn');
 
     let selected = [];
-    let lastError = null;
 
-    // Auto-fill sender from previous visit
     const savedName = localStorage.getItem('izzywedding-sender');
     if (savedName) senderEl.value = savedName;
 
@@ -149,12 +130,6 @@
       statusEl.textContent = msg || '';
       statusEl.classList.toggle('error', isError);
     }
-    function setBtnDisabled(disabled) {
-      uploadBtn.disabled = disabled;
-      uploadBtnD.disabled = disabled;
-      stickyCta.classList.toggle('is-visible', !disabled || progress.classList.contains('is-active'));
-    }
-
     function renderThumbs() {
       fileList.innerHTML = '';
       selected.forEach((file) => {
@@ -192,18 +167,11 @@
     }
 
     fileInput.addEventListener('change', (e) => addFiles(e.target.files));
-
     ;['dragenter', 'dragover'].forEach((evt) => {
-      dropzone.addEventListener(evt, (e) => {
-        e.preventDefault(); e.stopPropagation();
-        dropzone.classList.add('is-dragover');
-      });
+      dropzone.addEventListener(evt, (e) => { e.preventDefault(); e.stopPropagation(); dropzone.classList.add('is-dragover'); });
     });
     ;['dragleave', 'drop'].forEach((evt) => {
-      dropzone.addEventListener(evt, (e) => {
-        e.preventDefault(); e.stopPropagation();
-        dropzone.classList.remove('is-dragover');
-      });
+      dropzone.addEventListener(evt, (e) => { e.preventDefault(); e.stopPropagation(); dropzone.classList.remove('is-dragover'); });
     });
     dropzone.addEventListener('drop', (e) => {
       if (e.dataTransfer && e.dataTransfer.files) addFiles(e.dataTransfer.files);
@@ -214,16 +182,12 @@
         ? 'Terima kasih — your moment is with us.'
         : `Terima kasih — your ${count} moments are with us.`;
       document.getElementById('ceremonyMsg').textContent = msg;
-      // Crossfade card → ceremony
       uploadCard.style.display = 'none';
       stickyCta.classList.remove('is-visible');
       ceremony.classList.add('is-active');
-      // Quiet haptic acknowledgement
       try { navigator.vibrate && navigator.vibrate([8, 40, 12]); } catch {}
-      // Smooth scroll to top so the moment is fully visible
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-
     function resetForAnother() {
       ceremony.classList.remove('is-active');
       uploadCard.style.display = '';
@@ -233,21 +197,18 @@
       progress.classList.remove('is-active', 'is-indeterminate');
       progressBar.style.width = '0%';
     }
-
     addMoreBtn.addEventListener('click', resetForAnother);
     retryBtn.addEventListener('click', () => doUpload());
 
     function doUpload() {
       if (!selected.length) return;
       retryRow.style.display = 'none';
-      lastError = null;
       uploadBtn.disabled = true;
       uploadBtnD.disabled = true;
       progress.classList.add('is-active');
       progressBar.style.width = '0%';
       setStatus('Sending…');
 
-      // Persist sender for next visit
       const sender = senderEl.value.trim();
       if (sender) localStorage.setItem('izzywedding-sender', sender);
 
@@ -276,7 +237,6 @@
         } else {
           let msg = "We couldn't deliver those — let's try once more.";
           try { msg = JSON.parse(xhr.responseText).error || msg; } catch {}
-          lastError = msg;
           setStatus(msg, true);
           retryRow.style.display = '';
           uploadBtn.disabled = false;
@@ -286,8 +246,7 @@
       };
       xhr.onerror = () => {
         progress.classList.remove('is-active', 'is-indeterminate');
-        lastError = 'Network slowed down — your photos are still selected. Try again?';
-        setStatus(lastError, true);
+        setStatus('Network slowed down — your photos are still selected. Try again?', true);
         retryRow.style.display = '';
         uploadBtn.disabled = false;
         uploadBtnD.disabled = false;
@@ -295,7 +254,6 @@
       };
       xhr.send(fd);
     }
-
     uploadBtn.addEventListener('click', doUpload);
     uploadBtnD.addEventListener('click', doUpload);
   </script>

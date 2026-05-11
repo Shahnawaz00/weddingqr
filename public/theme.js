@@ -1,61 +1,87 @@
 // ════════════════════════════════════════════════════════════════
-//  Theme system — 4 distinct identities (colour, ornaments, border,
-//  button silhouette), with persistence and a soft cross-fade on
-//  swap so the page feels like it re-engraved itself, not flicked.
+//  Universe system — each universe is its own complete stylesheet
+//  in /themes/. We swap the link[id="universe"] href to switch.
+//  Runs synchronously in <head> so the right universe loads before
+//  first paint (no FOUC). Wires the picker on DOMContentLoaded.
+//
+//  Universes:
+//    cinema      — default; ink + ember + bone, monumental serif
+//    editorial   — off-white + mulberry, magazine spread
+//    manuscript  — cream + lapis + gold leaf + vermillion, illuminated
+//    garden      — cream + sage + blush, pressed-flower journal
 // ════════════════════════════════════════════════════════════════
 (function () {
-  const KEY = 'izzywedding-theme';
+  const KEY = 'izzywedding-universe';
+  const DEFAULT = 'cinema';
+  // All 4 universes are slotted in the picker. AVAILABLE is the subset
+  // that has a real stylesheet shipped — the rest are disabled in the
+  // picker until they land in follow-up commits.
+  const UNIVERSES = ['cinema', 'editorial', 'manuscript', 'garden'];
+  const AVAILABLE = ['cinema'];
   const NAMES = {
-    'default':  'Engraved Emerald',
-    'midnight': 'Midnight Ivory',
-    'rose':     'Mughal Rose',
-    'bronze':   'Desert Bronze',
+    cinema:     'Cinema',
+    editorial:  'Editorial',
+    manuscript: 'Manuscript',
+    garden:     'Garden',
   };
 
-  // URL ?theme=… wins over localStorage (handy for previews + screenshots).
-  const urlTheme = new URLSearchParams(location.search).get('theme');
-  const stored = urlTheme || localStorage.getItem(KEY) || 'default';
+  const urlUniverse = new URLSearchParams(location.search).get('theme')
+                   || new URLSearchParams(location.search).get('universe');
+  const stored = localStorage.getItem(KEY);
+  const initialRaw = (urlUniverse && AVAILABLE.includes(urlUniverse))
+    ? urlUniverse
+    : (stored && AVAILABLE.includes(stored) ? stored : DEFAULT);
+  const initial = initialRaw;
 
-  if (stored && stored !== 'default') {
-    document.documentElement.setAttribute('data-theme', stored);
-  }
-  if (urlTheme) localStorage.setItem(KEY, urlTheme);
-
-  function applyTheme(theme) {
-    const root = document.documentElement;
-
-    // Use View Transitions API for an animated crossfade if available.
-    const swap = () => {
-      if (!theme || theme === 'default') {
-        root.removeAttribute('data-theme');
-        localStorage.removeItem(KEY);
-      } else {
-        root.setAttribute('data-theme', theme);
-        localStorage.setItem(KEY, theme);
+  // Patch the universe stylesheet href before first paint
+  const setUniverse = (name) => {
+    if (!UNIVERSES.includes(name)) name = DEFAULT;
+    document.documentElement.setAttribute('data-universe', name);
+    const link = document.getElementById('universe');
+    if (link) {
+      const desired = `/themes/${name}.css`;
+      if (!link.getAttribute('href').endsWith(`/themes/${name}.css`)) {
+        link.setAttribute('href', desired);
       }
-      const nameEl = document.getElementById('themeName');
-      if (nameEl) nameEl.textContent = NAMES[theme || 'default'] || '';
-    };
+    }
+  };
+  setUniverse(initial);
+  if (urlUniverse) localStorage.setItem(KEY, initial);
 
+  function applyUniverse(name) {
+    if (!AVAILABLE.includes(name)) return;     // ignore clicks on unbuilt universes
+    const apply = () => {
+      setUniverse(name);
+      localStorage.setItem(KEY, name);
+      const nameEl = document.getElementById('themeName');
+      if (nameEl) nameEl.textContent = NAMES[name];
+    };
     if (document.startViewTransition && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      document.startViewTransition(swap);
+      document.startViewTransition(apply);
     } else {
-      swap();
+      apply();
     }
   }
 
   function wirePicker() {
     const picker = document.querySelector('.theme-picker');
     if (!picker) return;
-    const current = localStorage.getItem(KEY) || 'default';
+    const current = localStorage.getItem(KEY) || DEFAULT;
     const buttons = picker.querySelectorAll('.theme-swatch');
     const nameEl = document.getElementById('themeName');
     if (nameEl) nameEl.textContent = NAMES[current] || '';
     buttons.forEach((btn) => {
-      btn.classList.toggle('is-active', btn.dataset.theme === current);
+      const name = btn.dataset.theme;
+      const isAvailable = AVAILABLE.includes(name);
+      btn.classList.toggle('is-active', name === current);
+      btn.classList.toggle('is-disabled', !isAvailable);
+      if (!isAvailable) {
+        btn.setAttribute('aria-disabled', 'true');
+        btn.title = `${NAMES[name]} — coming soon`;
+      }
       btn.addEventListener('click', () => {
-        const theme = btn.dataset.theme;
-        applyTheme(theme);
+        if (!isAvailable) return;
+        applyUniverse(name);
         buttons.forEach((b) => b.classList.toggle('is-active', b === btn));
       });
     });
