@@ -1,0 +1,24 @@
+# Netlify configuration.
+# The actual site lives in /public; the rest of the repo is the local
+# Express dev server (server.js) which Netlify doesn't run.
+#
+# `command = ""` tells Netlify there's no build step — the static
+# files are committed straight to disk. `publish = "public"` points
+# Netlify at the right folder.
+[build]
+  publish = "public"
+  command = ""
+
+# Netlify Functions would go in netlify/functions/, mapped from /api/*.
+# Not wired yet — POST /api/upload and GET /api/photos will 404 on
+# Netlify until those endpoints are ported from server.js.
+
+[[headers]]
+  for = "/themes/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800, immutable"
+
+[[headers]]
+  for = "/*.svg"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"
