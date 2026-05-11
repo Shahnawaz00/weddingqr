@@ -73,7 +73,10 @@ body::before {
 .lb-bar {
   position: fixed;
   left: 0; right: 0;
-  height: 12vh;
+  /* Mobile: 7vh per bar (~50px on a 720px viewport) so the hero
+     isn't crammed between thick black bands on a phone. Desktop
+     widens to 12vh in the @media block below. */
+  height: 7vh;
   background: var(--ink);
   border-color: var(--ember);
   z-index: 100;
@@ -98,11 +101,14 @@ input, button, textarea { font: inherit; color: inherit; background: transparent
   z-index: 1;
   max-width: var(--measure);
   margin: 0 auto;
-  padding: 14vh var(--pad) 4rem;             /* generous top space to feel framed */
+  /* Mobile-first vertical rhythm. Top padding stays clear of the
+     letterbox bar (7vh) plus a comfortable beat of breathing space. */
+  padding: 9vh var(--pad) 3rem;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  overflow-x: clip;          /* names with negative tracking can't push past viewport */
 }
 .container.has-sticky { padding-bottom: calc(7rem + var(--safe-bottom)); }
 
@@ -210,8 +216,12 @@ input, button, textarea { font: inherit; color: inherit; background: transparent
   margin: 0;
   line-height: 0.92;
   letter-spacing: -0.025em;
-  font-size: clamp(4.5rem, 18vw, 9rem);
+  /* Mobile-first: smaller floor so short names breathe on a 360px
+     viewport and don't push siblings off-screen. Desktop scales up. */
+  font-size: clamp(3.5rem, 18vw, 9rem);
   text-shadow: 0 0 32px rgba(232, 223, 200, 0.04);
+  /* Guard against any name accidentally overflowing the viewport */
+  overflow-wrap: anywhere;
 }
 .hero h1 .name {
   display: block;
@@ -256,23 +266,26 @@ input, button, textarea { font: inherit; color: inherit; background: transparent
 /* ── Meta line: date · venue ────────────────────────────────── */
 .meta-combined {
   font-family: var(--body);
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   font-weight: 500;
-  letter-spacing: 0.42em;
+  letter-spacing: 0.32em;       /* mobile-tightened; the wider 0.42em comes back on desktop */
   text-transform: uppercase;
   color: var(--bone-mute);
-  margin: 2.5rem 0 0;
+  margin: 2rem 0 0;
   text-align: center;
   font-variant-numeric: tabular-nums;
+  line-height: 2.1;             /* room for stacking on mobile */
 }
 .meta-combined .sep {
-  display: inline-block;
-  margin: 0 1em;
+  display: block;               /* mobile: separator becomes its own thin row */
+  margin: 0.2rem 0;
   color: var(--ember);
   letter-spacing: 0;
+  font-size: 0.9em;
 }
 .meta-combined .venue {
   color: var(--bone-mute);
+  display: block;
 }
 .meta-hijri {
   font-family: var(--body);
@@ -1095,10 +1108,15 @@ input[type="file"] { display: none; }
   :root { --pad: 2.5rem; --measure: 1080px; }
   .container { padding: 16vh var(--pad) 5rem; }
   .container.has-sticky { padding-bottom: 5rem; }
+  .lb-bar { height: 12vh; }
   .sticky-cta { display: none; }
   .desktop-only-cta { display: flex !important; }
   .btn-row { flex-direction: row; justify-content: center; gap: 2rem; }
   .btn-row .btn { width: auto; min-width: 260px; }
+  /* On desktop, meta line goes inline */
+  .meta-combined { font-size: 0.7rem; letter-spacing: 0.42em; line-height: 1.6; }
+  .meta-combined .sep { display: inline-block; margin: 0 1em; font-size: 1em; vertical-align: middle; }
+  .meta-combined .venue { display: inline; }
 }
 .desktop-only-cta { display: none; }
 

@@ -60,37 +60,39 @@ input, button, textarea { font: inherit; color: inherit; background: transparent
   position: relative;
   max-width: var(--measure);
   margin: 0 auto;
-  padding: 3rem var(--pad) 4rem;
+  padding: 2.5rem var(--pad) 3rem;
   min-height: 100vh;
+  overflow-x: clip;          /* guard against asymmetric offsets overflowing */
 }
 .container.has-sticky { padding-bottom: calc(7rem + var(--safe-bottom)); }
 
-/* Editorial page-number mark — sits in the top-right corner of
-   every page. The number itself is set by the active page's CSS
-   below; here we just style the slot. */
+/* Editorial corner marks — kept short on mobile (just the date)
+   so they don't run into each other; expand to the full colophon
+   on desktop. */
 .container::before {
-  content: 'IZZY & ADAM / 09.26';
+  content: '09.26';
   position: absolute;
-  top: 1.5rem;
+  top: 1.25rem;
   right: var(--pad);
   font-family: var(--mono);
-  font-size: 0.62rem;
+  font-size: 0.58rem;
   font-weight: 500;
-  letter-spacing: 0.32em;
+  letter-spacing: 0.28em;
   text-transform: uppercase;
   color: var(--ink-mute);
+  font-variant-numeric: tabular-nums;
 }
 .container::after {
   content: '01';
   position: absolute;
-  top: 1.5rem;
+  top: 1rem;
   left: var(--pad);
   font-family: var(--display);
   font-weight: 900;
   font-size: 0.85rem;
   font-variant-numeric: lining-nums tabular-nums;
   color: var(--mulberry);
-  letter-spacing: 0.04em;
+  letter-spacing: 0.02em;
 }
 
 /* ── Reveal: one typographic beat ───────────────────────────── */
@@ -178,21 +180,25 @@ input, button, textarea { font: inherit; color: inherit; background: transparent
 .eyebrow-label::after,
 .eyebrow::after { display: none; }
 
-/* ── Hero ───────────────────────────────────────────────────── */
+/* ── Hero (mobile-first; asymmetric offsets stay hinted on phone
+       and become full editorial offsets on desktop) ──────────── */
 .hero {
   text-align: left;
-  padding: 2rem 0;
-  margin-top: 2rem;
+  padding: 2rem 0 1.5rem;
+  margin-top: 1.5rem;
 }
 .hero h1 {
   font-family: var(--display);
   font-weight: 900;
   color: var(--ink);
   margin: 0;
-  line-height: 0.95;
-  letter-spacing: -0.04em;
-  font-size: clamp(4.5rem, 22vw, 9.5rem);
+  line-height: 0.92;
+  letter-spacing: -0.035em;
+  /* Mobile floor 3.4rem — leaves room for even a long name; vw lets
+     it grow on tablet/desktop. */
+  font-size: clamp(3.4rem, 19vw, 9.5rem);
   text-align: left;
+  overflow-wrap: anywhere;
 }
 .hero h1 .name {
   display: block;
@@ -202,7 +208,7 @@ input, button, textarea { font: inherit; color: inherit; background: transparent
 .hero h1 .name:nth-of-type(1) { animation-delay: 350ms; }
 .hero h1 .name:nth-of-type(2) {
   animation-delay: 700ms;
-  margin-left: clamp(0.5rem, 8vw, 2.5rem);  /* offset second name for asymmetry */
+  margin-left: clamp(0.5rem, 4vw, 2.5rem);  /* gentle asymmetry on mobile */
 }
 .hero h1 .ampersand {
   display: block;
@@ -212,7 +218,7 @@ input, button, textarea { font: inherit; color: inherit; background: transparent
   font-size: 0.42em;
   line-height: 1;
   color: var(--mulberry);
-  margin: -0.1em 0 -0.1em clamp(2rem, 12vw, 5rem);
+  margin: -0.05em 0 -0.05em clamp(1rem, 6vw, 5rem);
   letter-spacing: 0;
   opacity: 0;
   animation: ed-rise 700ms var(--ease) 550ms forwards;
@@ -252,7 +258,7 @@ input, button, textarea { font: inherit; color: inherit; background: transparent
   margin: 3rem 0 0;
   text-align: left;
   font-variant-numeric: tabular-nums;
-  padding-left: clamp(0, 8vw, 2.5rem);
+  padding-left: 0;
 }
 .meta-combined .sep {
   display: inline-block;
@@ -270,7 +276,7 @@ input, button, textarea { font: inherit; color: inherit; background: transparent
   color: var(--mulberry);
   margin: 0.6rem 0 0;
   text-align: left;
-  padding-left: clamp(0, 8vw, 2.5rem);
+  padding-left: 0;
 }
 
 .tagline {
@@ -283,7 +289,7 @@ input, button, textarea { font: inherit; color: inherit; background: transparent
   max-width: 32ch;
   line-height: 1.4;
   text-align: left;
-  padding-left: clamp(0, 8vw, 2.5rem);
+  padding-left: 0;
   text-wrap: pretty;
 }
 
@@ -306,7 +312,7 @@ input, button, textarea { font: inherit; color: inherit; background: transparent
   justify-content: flex-start;
   align-items: center;
   margin: 2.5rem 0;
-  padding-left: clamp(0, 8vw, 2.5rem);
+  padding-left: 0;
 }
 .rule-diamond::before {
   content: '';
@@ -400,7 +406,7 @@ input, button, textarea { font: inherit; color: inherit; background: transparent
   align-items: flex-start;
   gap: 1rem;
   margin-top: 3rem;
-  padding-left: clamp(0, 8vw, 2.5rem);
+  padding-left: 0;
 }
 .btn-row .btn { width: min(100%, 320px); }
 
@@ -888,7 +894,7 @@ input[type="file"] { display: none; }
   padding-top: 2.5rem;
   border-top: 1px solid var(--ink);
   position: relative;
-  padding-left: clamp(0, 8vw, 2.5rem);
+  padding-left: 0;
 }
 .foot .seal {
   width: 44px; height: 44px;
@@ -1027,10 +1033,18 @@ input[type="file"] { display: none; }
   .container.has-sticky { padding-bottom: 5rem; }
   .sticky-cta { display: none; }
   .desktop-only-cta { display: flex !important; }
-  .btn-row { flex-direction: row; justify-content: flex-start; gap: 1.5rem; padding-left: clamp(0, 8vw, 2.5rem); }
+  .btn-row { flex-direction: row; justify-content: flex-start; gap: 1.5rem; padding-left: clamp(0rem, 8vw, 2.5rem); }
   .btn-row .btn { width: auto; min-width: 240px; }
+  .meta-combined,
+  .meta-hijri,
+  .tagline,
+  .rule-diamond,
+  .foot { padding-left: clamp(0rem, 8vw, 2.5rem); }
   .hero h1 .name:nth-of-type(2) { margin-left: clamp(2rem, 16vw, 6rem); }
   .hero h1 .ampersand { margin-left: clamp(4rem, 20vw, 8rem); }
+  /* Desktop: full colophon in the top-right + larger page number */
+  .container::before { content: 'IZZY & ADAM / 09.26'; font-size: 0.62rem; letter-spacing: 0.32em; }
+  .container::after  { font-size: 1.1rem; top: 1.5rem; }
 }
 .desktop-only-cta { display: none; }
 
