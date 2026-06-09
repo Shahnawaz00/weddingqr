@@ -45,7 +45,6 @@ window.WEDDING_CONFIG = {
   //  `label` = what guests see.
   // ────────────────────────────────────────────────────────────
   events: [
-    { slug: 'all',         label: 'All'          },
     { slug: 'akad-nikah',  label: 'Akad Nikah'   },
     { slug: 'bersanding',  label: 'Bersanding'   },
     { slug: 'lain-lain',   label: 'Lain-lain'    },

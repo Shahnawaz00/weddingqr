@@ -107,6 +107,29 @@
     <button class="btn btn-primary" id="uploadBtn" disabled>Upload</button>
   </div>
 
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Photo preview">
+    <button class="lb-close" id="lbClose" type="button" aria-label="Close">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+    <div class="lb-stage"><div id="lbContent"></div></div>
+    <div class="lb-controls">
+      <button class="lb-nav lb-prev" id="lbPrev" type="button" aria-label="Previous">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+      </button>
+      <div class="lb-counter" id="lbCounter"></div>
+      <button class="lb-nav lb-next" id="lbNext" type="button" aria-label="Next">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </button>
+    </div>
+  </div>
+
   <script>
     const c = window.WEDDING_CONFIG || {};
     document.getElementById('brideTop').textContent = c.brideName || '';
@@ -153,6 +176,7 @@
     const addMoreBtn = document.getElementById('addMoreBtn');
 
     let selected = [];
+    let urls = [];   // object URLs, index-aligned with `selected`
 
     const savedName = localStorage.getItem('izzywedding-sender');
     if (savedName) senderEl.value = savedName;
@@ -161,43 +185,133 @@
       statusEl.textContent = msg || '';
       statusEl.classList.toggle('error', isError);
     }
+    const ICON_X = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>';
+
+    function refreshUrls() {
+      urls.forEach((u) => URL.revokeObjectURL(u));
+      urls = selected.map((f) => URL.createObjectURL(f));
+    }
     function renderThumbs() {
+      refreshUrls();
       fileList.innerHTML = '';
-      selected.forEach((file) => {
+      selected.forEach((file, idx) => {
         const thumb = document.createElement('div');
         thumb.className = 'thumb';
-        const url = URL.createObjectURL(file);
+        thumb.setAttribute('role', 'button');
+        thumb.setAttribute('aria-label', 'View ' + file.name);
         if (file.type.startsWith('video/')) {
           const v = document.createElement('video');
-          v.src = url; v.muted = true; v.playsInline = true;
+          v.src = urls[idx]; v.muted = true; v.playsInline = true;
           thumb.appendChild(v);
           const b = document.createElement('span');
           b.className = 'badge'; b.textContent = 'video';
           thumb.appendChild(b);
         } else {
           const img = document.createElement('img');
-          img.src = url; img.alt = file.name;
+          img.src = urls[idx]; img.alt = file.name;
           thumb.appendChild(img);
         }
+        const rm = document.createElement('button');
+        rm.type = 'button';
+        rm.className = 'thumb-remove';
+        rm.setAttribute('aria-label', 'Remove ' + file.name);
+        rm.innerHTML = ICON_X;
+        rm.addEventListener('click', (e) => { e.stopPropagation(); removeAt(idx); });
+        thumb.appendChild(rm);
+        thumb.addEventListener('click', () => openPreview(idx));
         fileList.appendChild(thumb);
       });
+      if (selected.length > 0 && selected.length < 30) {
+        const add = document.createElement('button');
+        add.type = 'button';
+        add.className = 'thumb thumb-add';
+        add.innerHTML = '<span class="plus">+</span><small>Add more</small>';
+        add.addEventListener('click', () => fileInput.click());
+        fileList.appendChild(add);
+      }
       const empty = selected.length === 0;
       uploadBtn.disabled = empty;
       uploadBtnD.disabled = empty;
       stickyCta.classList.toggle('is-visible', !empty);
     }
 
+    function removeAt(idx) {
+      selected.splice(idx, 1);
+      renderThumbs();
+      if (selected.length) {
+        setStatus(`${selected.length} ${selected.length === 1 ? 'file' : 'files'} ready to upload.`);
+      } else {
+        setStatus('');
+      }
+    }
+
     function addFiles(files) {
       const arr = Array.from(files).filter((f) =>
         f.type.startsWith('image/') || f.type.startsWith('video/')
       );
+      const before = selected.length;
       selected = selected.concat(arr).slice(0, 30);
       renderThumbs();
-      if (arr.length) setStatus(`${selected.length} ${selected.length === 1 ? 'file' : 'files'} ready to upload.`);
+      const added = selected.length - before;
+      if (added) setStatus(`${selected.length} ${selected.length === 1 ? 'file' : 'files'} ready to upload.`);
       retryRow.style.display = 'none';
     }
 
-    fileInput.addEventListener('change', (e) => addFiles(e.target.files));
+    fileInput.addEventListener('change', (e) => { addFiles(e.target.files); fileInput.value = ''; });
+
+    // ── Tap-to-preview lightbox (mirrors the gallery viewer) ──────
+    const lightbox = document.getElementById('lightbox');
+    const lbContent = document.getElementById('lbContent');
+    const lbClose = document.getElementById('lbClose');
+    const lbPrev = document.getElementById('lbPrev');
+    const lbNext = document.getElementById('lbNext');
+    const lbCounter = document.getElementById('lbCounter');
+    let pvIndex = -1, pvTouchX = 0;
+
+    function updatePreview() {
+      if (pvIndex < 0 || pvIndex >= selected.length) return;
+      const file = selected[pvIndex];
+      lbContent.innerHTML = '';
+      const el = file.type.startsWith('video/')
+        ? Object.assign(document.createElement('video'), { src: urls[pvIndex], controls: true, autoplay: true, playsInline: true })
+        : Object.assign(document.createElement('img'), { src: urls[pvIndex], alt: file.name });
+      lbContent.appendChild(el);
+      lbCounter.textContent = `${pvIndex + 1} / ${selected.length}`;
+      lbPrev.disabled = pvIndex === 0;
+      lbNext.disabled = pvIndex === selected.length - 1;
+    }
+    function openPreview(idx) {
+      pvIndex = idx;
+      updatePreview();
+      lightbox.classList.add('is-open');
+      document.body.style.overflow = 'hidden';
+    }
+    function closePreview() {
+      lightbox.classList.remove('is-open');
+      document.body.style.overflow = '';
+      pvIndex = -1;
+      setTimeout(() => { if (!lightbox.classList.contains('is-open')) { lbContent.innerHTML = ''; lbCounter.textContent = ''; } }, 380);
+    }
+    function navPreview(delta) {
+      pvIndex = Math.max(0, Math.min(selected.length - 1, pvIndex + delta));
+      updatePreview();
+    }
+    lbClose.addEventListener('click', closePreview);
+    lbPrev.addEventListener('click', () => navPreview(-1));
+    lbNext.addEventListener('click', () => navPreview(1));
+    lightbox.addEventListener('click', (e) => { if (e.target === lightbox) closePreview(); });
+    document.addEventListener('keydown', (e) => {
+      if (!lightbox.classList.contains('is-open')) return;
+      if (e.key === 'Escape') closePreview();
+      if (e.key === 'ArrowLeft') navPreview(-1);
+      if (e.key === 'ArrowRight') navPreview(1);
+    });
+    lightbox.addEventListener('touchstart', (e) => { pvTouchX = e.touches[0].clientX; }, { passive: true });
+    lightbox.addEventListener('touchend', (e) => {
+      const dx = e.changedTouches[0].clientX - pvTouchX;
+      if (dx < -50) navPreview(1);
+      if (dx > 50) navPreview(-1);
+    });
     ;['dragenter', 'dragover'].forEach((evt) => {
       dropzone.addEventListener(evt, (e) => { e.preventDefault(); e.stopPropagation(); dropzone.classList.add('is-dragover'); });
     });

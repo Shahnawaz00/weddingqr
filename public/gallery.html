@@ -78,18 +78,20 @@
         <line x1="6" y1="6" x2="18" y2="18"></line>
       </svg>
     </button>
-    <button class="lb-nav lb-prev" id="lbPrev" type="button" aria-label="Previous photo">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <polyline points="15 18 9 12 15 6"></polyline>
-      </svg>
-    </button>
-    <div id="lbContent"></div>
-    <button class="lb-nav lb-next" id="lbNext" type="button" aria-label="Next photo">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <polyline points="9 18 15 12 9 6"></polyline>
-      </svg>
-    </button>
-    <div class="lb-counter" id="lbCounter"></div>
+    <div class="lb-stage"><div id="lbContent"></div></div>
+    <div class="lb-controls">
+      <button class="lb-nav lb-prev" id="lbPrev" type="button" aria-label="Previous photo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+      </button>
+      <div class="lb-counter" id="lbCounter"></div>
+      <button class="lb-nav lb-next" id="lbNext" type="button" aria-label="Next photo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </button>
+    </div>
   </div>
 
   <script>
@@ -112,10 +114,6 @@
     let currentPhotoIndex = -1;
     let touchStartX = 0;
 
-    function vtNameFor(p) {
-      const base = (p.url || p.key || '').replace(/[^a-zA-Z0-9]/g, '_');
-      return `photo_${base.slice(-40)}`;
-    }
     function getVisiblePhotos() {
       return active === 'all' ? allPhotos : allPhotos.filter((p) => p.event === active);
     }
@@ -129,27 +127,23 @@
         : Object.assign(document.createElement('img'), { src: photo.url, alt: '' });
       lbContent.appendChild(el);
       lbCounter.textContent = `${currentPhotoIndex + 1} / ${visible.length}`;
-      lbPrev.style.opacity = currentPhotoIndex === 0 ? '0.5' : '1';
-      lbNext.style.opacity = currentPhotoIndex === visible.length - 1 ? '0.5' : '1';
+      lbPrev.disabled = currentPhotoIndex === 0;
+      lbNext.disabled = currentPhotoIndex === visible.length - 1;
     }
-    function openLightbox(photo, sourceEl) {
+    function openLightbox(photo) {
       const visible = getVisiblePhotos();
       currentPhotoIndex = visible.findIndex((p) => p.url === photo.url);
       if (currentPhotoIndex < 0) return;
-      const sourceVtName = sourceEl.style.viewTransitionName;
-      const show = () => {
-        updateLightbox();
-        lightbox.classList.add('is-open');
-      };
-      if (document.startViewTransition && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        document.startViewTransition(show);
-      } else { show(); }
+      updateLightbox();
+      lightbox.classList.add('is-open');
+      document.body.style.overflow = 'hidden';
     }
     function closeLightbox() {
-      const close = () => { lightbox.classList.remove('is-open'); lbContent.innerHTML = ''; currentPhotoIndex = -1; lbCounter.textContent = ''; };
-      if (document.startViewTransition && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        document.startViewTransition(close);
-      } else { close(); }
+      lightbox.classList.remove('is-open');
+      document.body.style.overflow = '';
+      currentPhotoIndex = -1;
+      // Clear after the fade-out so the photo doesn't vanish mid-transition.
+      setTimeout(() => { if (!lightbox.classList.contains('is-open')) { lbContent.innerHTML = ''; lbCounter.textContent = ''; } }, 380);
     }
     function navPhoto(delta) {
       const visible = getVisiblePhotos();
@@ -188,8 +182,7 @@
       visible.forEach((p) => {
         const a = document.createElement('a');
         a.href = p.url; a.target = '_blank'; a.rel = 'noopener';
-        a.style.viewTransitionName = vtNameFor(p);
-        a.addEventListener('click', (e) => { e.preventDefault(); openLightbox(p, a); });
+        a.addEventListener('click', (e) => { e.preventDefault(); openLightbox(p); });
         if (p.isVideo) {
           const v = document.createElement('video');
           v.src = p.url; v.muted = true; v.playsInline = true; v.preload = 'metadata';
