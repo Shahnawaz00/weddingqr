@@ -763,7 +763,7 @@ input[type="file"] { display: none; }
   line-height: 1.4;
   text-wrap: balance;
 }
-.ceremony .ceremony-sub { margin-top: 1.75rem; }
+.ceremony .ceremony-sub { margin-top: 1.75rem; display: flex; flex-direction: column; align-items: center; gap: 1.25rem; }
 
 /* ── Gallery ────────────────────────────────────────────────── */
 .gallery-filters {
@@ -888,20 +888,55 @@ input[type="file"] { display: none; }
 }
 .lightbox .lb-close {
   position: absolute;
-  top: 1rem; right: 1rem;
-  width: 44px; height: 44px;
+  top: 1.5rem; right: 1.5rem;
+  width: 48px; height: 48px;
   border: 0.5px solid var(--gold);
   background: var(--paper);
   color: var(--emerald);
-  font-family: var(--body);
-  font-size: 1.4rem;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
+  transition: all 200ms ease;
+  z-index: 201;
 }
-.lightbox .lb-close:hover { background: var(--gold); color: var(--paper-bright); }
+.lightbox .lb-close:hover { background: var(--gold); color: var(--paper-bright); transform: scale(1.05); }
+.lightbox .lb-close svg { width: 24px; height: 24px; }
+.lightbox .lb-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 48px; height: 48px;
+  border: 0.5px solid var(--gold);
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--paper);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 200ms ease;
+  backdrop-filter: blur(8px);
+}
+.lightbox .lb-nav:hover { background: rgba(255, 255, 255, 0.2); transform: translateY(-50%) scale(1.05); }
+.lightbox .lb-nav svg { width: 24px; height: 24px; }
+.lightbox .lb-prev { left: 1.5rem; }
+.lightbox .lb-next { right: 1.5rem; }
+.lightbox .lb-counter {
+  position: absolute;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--paper);
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-family: var(--mono);
+  backdrop-filter: blur(8px);
+  border: 0.5px solid var(--gold);
+}
 
 /* ── QR card ────────────────────────────────────────────────── */
 .qr-stage { display: flex; justify-content: center; padding: 1.5rem 0; }

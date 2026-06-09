@@ -72,8 +72,24 @@
   </div>
 
   <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Photo viewer">
-    <button class="lb-close" id="lbClose" type="button" aria-label="Close">×</button>
+    <button class="lb-close" id="lbClose" type="button" aria-label="Close">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+    <button class="lb-nav lb-prev" id="lbPrev" type="button" aria-label="Previous photo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="15 18 9 12 15 6"></polyline>
+      </svg>
+    </button>
     <div id="lbContent"></div>
+    <button class="lb-nav lb-next" id="lbNext" type="button" aria-label="Next photo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="9 18 15 12 9 6"></polyline>
+      </svg>
+    </button>
+    <div class="lb-counter" id="lbCounter"></div>
   </div>
 
   <script>
@@ -87,23 +103,42 @@
     const lightbox = document.getElementById('lightbox');
     const lbContent = document.getElementById('lbContent');
     const lbClose = document.getElementById('lbClose');
+    const lbPrev = document.getElementById('lbPrev');
+    const lbNext = document.getElementById('lbNext');
+    const lbCounter = document.getElementById('lbCounter');
     const events = Array.isArray(c.events) ? c.events : [];
     let allPhotos = [];
     let active = 'all';
+    let currentPhotoIndex = -1;
+    let touchStartX = 0;
 
     function vtNameFor(p) {
       const base = (p.url || p.key || '').replace(/[^a-zA-Z0-9]/g, '_');
       return `photo_${base.slice(-40)}`;
     }
+    function getVisiblePhotos() {
+      return active === 'all' ? allPhotos : allPhotos.filter((p) => p.event === active);
+    }
+    function updateLightbox() {
+      const visible = getVisiblePhotos();
+      if (currentPhotoIndex < 0 || currentPhotoIndex >= visible.length) return;
+      const photo = visible[currentPhotoIndex];
+      lbContent.innerHTML = '';
+      const el = photo.isVideo
+        ? Object.assign(document.createElement('video'), { src: photo.url, controls: true, autoplay: true, playsInline: true })
+        : Object.assign(document.createElement('img'), { src: photo.url, alt: '' });
+      lbContent.appendChild(el);
+      lbCounter.textContent = `${currentPhotoIndex + 1} / ${visible.length}`;
+      lbPrev.style.opacity = currentPhotoIndex === 0 ? '0.5' : '1';
+      lbNext.style.opacity = currentPhotoIndex === visible.length - 1 ? '0.5' : '1';
+    }
     function openLightbox(photo, sourceEl) {
+      const visible = getVisiblePhotos();
+      currentPhotoIndex = visible.findIndex((p) => p.url === photo.url);
+      if (currentPhotoIndex < 0) return;
       const sourceVtName = sourceEl.style.viewTransitionName;
       const show = () => {
-        lbContent.innerHTML = '';
-        const el = photo.isVideo
-          ? Object.assign(document.createElement('video'), { src: photo.url, controls: true, autoplay: true, playsInline: true })
-          : Object.assign(document.createElement('img'), { src: photo.url, alt: '' });
-        if (sourceVtName) el.style.viewTransitionName = sourceVtName;
-        lbContent.appendChild(el);
+        updateLightbox();
         lightbox.classList.add('is-open');
       };
       if (document.startViewTransition && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
@@ -111,15 +146,32 @@
       } else { show(); }
     }
     function closeLightbox() {
-      const el = lbContent.firstElementChild;
-      const close = () => { lightbox.classList.remove('is-open'); lbContent.innerHTML = ''; };
-      if (el && document.startViewTransition && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      const close = () => { lightbox.classList.remove('is-open'); lbContent.innerHTML = ''; currentPhotoIndex = -1; lbCounter.textContent = ''; };
+      if (document.startViewTransition && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
         document.startViewTransition(close);
       } else { close(); }
     }
+    function navPhoto(delta) {
+      const visible = getVisiblePhotos();
+      currentPhotoIndex = Math.max(0, Math.min(visible.length - 1, currentPhotoIndex + delta));
+      updateLightbox();
+    }
     lbClose.addEventListener('click', closeLightbox);
+    lbPrev.addEventListener('click', () => navPhoto(-1));
+    lbNext.addEventListener('click', () => navPhoto(1));
     lightbox.addEventListener('click', (e) => { if (e.target === lightbox) closeLightbox(); });
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && lightbox.classList.contains('is-open')) closeLightbox(); });
+    document.addEventListener('keydown', (e) => {
+      if (!lightbox.classList.contains('is-open')) return;
+      if (e.key === 'Escape') closeLightbox();
+      if (e.key === 'ArrowLeft') navPhoto(-1);
+      if (e.key === 'ArrowRight') navPhoto(1);
+    });
+    lightbox.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; });
+    lightbox.addEventListener('touchend', (e) => {
+      const touchEndX = e.changedTouches[0].clientX;
+      if (touchStartX - touchEndX > 50) navPhoto(1);
+      if (touchEndX - touchStartX > 50) navPhoto(-1);
+    });
 
     function render() {
       gallery.innerHTML = '';
