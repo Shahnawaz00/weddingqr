@@ -691,24 +691,21 @@ input[type="file"] { display: none; }
    as a comfortable thumb target. */
 .thumb-remove {
   position: absolute;
-  top: 4px; right: 4px;
+  top: 0; right: 0;
   width: 28px; height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
-  border: 0.5px solid color-mix(in srgb, var(--paper-bright) 60%, transparent);
-  background: rgba(20, 10, 4, 0.6);
-  color: var(--paper-bright);
+  border-radius: 0;                              /* squared paper chip */
+  border: 0.5px solid var(--gold);
+  background: var(--paper-bright);
+  color: var(--emerald);
   cursor: pointer;
   padding: 0;
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-  transition: background 180ms var(--ease), transform 180ms var(--ease);
+  transition: background 180ms var(--ease), color 180ms var(--ease);
   z-index: 2;
 }
-.thumb-remove:hover { background: var(--error); transform: scale(1.08); }
-.thumb-remove:active { transform: scale(0.92); }
+.thumb-remove:hover { background: var(--error); color: var(--paper-bright); border-color: var(--error); }
 .thumb-remove svg { width: 14px; height: 14px; }
 /* "Add more" tile — sits as the last cell in the grid. */
 .thumb-add {
@@ -917,14 +914,12 @@ input[type="file"] { display: none; }
 /* ── Lightbox — premium framed viewer ───────────────────────── */
 .lightbox {
   position: fixed; inset: 0;
-  /* Warm near-black gallery wall — not a flat orange flood. A soft
-     radial warms the centre where the photo sits. */
-  background:
-    radial-gradient(120% 90% at 50% 42%,
-      color-mix(in srgb, var(--emerald-deep) 42%, #1c0e04) 0%,
-      #150a03 62%, #0d0602 100%);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  /* Warm dimmed veil — a deep ink wash over the paper world, NOT a
+     dark-mode flood and NOT the flat orange. The fixed paper texture
+     still reads faintly beneath it, so the viewer stays in-language. */
+  background: color-mix(in srgb, var(--ink) 88%, transparent);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -934,7 +929,7 @@ input[type="file"] { display: none; }
   cursor: zoom-out;
   opacity: 0;
   visibility: hidden;
-  transition: opacity 360ms var(--ease), visibility 0s linear 360ms;
+  transition: opacity 320ms var(--ease), visibility 0s linear 320ms;
 }
 .lightbox.is-open {
   opacity: 1;
@@ -953,93 +948,82 @@ input[type="file"] { display: none; }
 #lbContent { display: flex; align-items: center; justify-content: center; }
 .lightbox img, .lightbox video {
   max-width: min(94vw, 1100px);
-  max-height: 78vh;
+  max-height: 80vh;
   object-fit: contain;
   display: block;
-  border-radius: 3px;
-  border: 1px solid color-mix(in srgb, var(--gold) 70%, transparent);
-  outline: 0.5px solid color-mix(in srgb, var(--gold-deep) 60%, transparent);
-  outline-offset: 5px;
-  box-shadow:
-    0 2px 0 rgba(0, 0, 0, 0.4),
-    0 40px 110px rgba(0, 0, 0, 0.6),
-    0 16px 40px rgba(0, 0, 0, 0.45);
+  border-radius: 0;                              /* squared, like the cards */
+  border: 0.5px solid var(--gold);
+  outline: 0.5px solid var(--gold-deep);         /* the engraved double-frame */
+  outline-offset: 4px;
+  box-shadow: 0 26px 64px rgba(0, 0, 0, 0.42);
   cursor: default;
-  /* Every freshly-inserted media element plays a clean zoom-fade — used
+  /* Every freshly-inserted media element plays a clean fade-rise — used
      for both the initial open and each prev/next swap, so there is never
      an overlapping double-image. */
-  animation: lb-media-in 440ms var(--ease) both;
+  animation: lb-media-in 420ms var(--ease) both;
 }
 @keyframes lb-media-in {
-  from { opacity: 0; transform: scale(0.965) translateY(10px); }
+  from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: none; }
 }
 
 .lightbox .lb-close {
   position: absolute;
-  top: max(1.1rem, env(safe-area-inset-top, 0px));
-  right: 1.1rem;
+  top: max(1.25rem, env(safe-area-inset-top, 0px));
+  right: 1.25rem;
   width: 46px; height: 46px;
-  border: 0.5px solid color-mix(in srgb, var(--gold) 65%, transparent);
-  background: rgba(20, 10, 4, 0.4);
-  color: var(--gold-bright);
+  border: 0.5px solid var(--gold);
+  background: var(--paper-bright);
+  color: var(--emerald);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  transition: background 220ms var(--ease), color 220ms var(--ease), transform 220ms var(--ease);
+  border-radius: 0;                              /* squared paper chip */
+  transition: background 200ms var(--ease), color 200ms var(--ease);
   z-index: 202;
 }
-.lightbox .lb-close:hover { background: var(--gold); color: #150a03; transform: rotate(90deg) scale(1.05); }
+.lightbox .lb-close:hover { background: var(--emerald); color: var(--paper-bright); }
 .lightbox .lb-close svg { width: 22px; height: 22px; }
 
-/* Bottom control cluster — prev · counter · next. Thumb-reachable,
-   centred, and clear of the photo on every screen size. */
+/* Bottom control cluster — prev · counter · next. Squared paper chips
+   matching the gallery filters; thumb-reachable and clear of the photo. */
 .lb-controls {
   position: absolute;
-  bottom: calc(1.25rem + var(--safe-bottom));
+  bottom: calc(1.5rem + var(--safe-bottom));
   left: 50%;
   transform: translateX(-50%);
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.4rem 0.55rem;
-  background: rgba(20, 10, 4, 0.42);
-  border: 0.5px solid color-mix(in srgb, var(--gold) 50%, transparent);
-  border-radius: 999px;
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.4);
+  gap: 0.85rem;
   z-index: 201;
 }
 .lightbox .lb-nav {
   position: static;
-  width: 46px; height: 46px;
-  border: 0.5px solid color-mix(in srgb, var(--gold) 45%, transparent);
-  background: transparent;
-  color: var(--gold-bright);
+  width: 48px; height: 48px;
+  border: 0.5px solid var(--gold);
+  background: var(--paper-bright);
+  color: var(--emerald);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
-  transition: background 200ms var(--ease), color 200ms var(--ease), transform 200ms var(--ease);
+  border-radius: 0;                              /* squared, sharp */
+  transition: background 200ms var(--ease), color 200ms var(--ease);
 }
-.lightbox .lb-nav:hover { background: var(--gold); color: #150a03; transform: scale(1.06); }
-.lightbox .lb-nav:active { transform: scale(0.96); }
-.lightbox .lb-nav:disabled { opacity: 0.32; cursor: default; pointer-events: none; }
+.lightbox .lb-nav:hover { background: var(--emerald); color: var(--paper-bright); }
+.lightbox .lb-nav:disabled { opacity: 0.3; cursor: default; pointer-events: none; }
 .lightbox .lb-nav svg { width: 22px; height: 22px; }
 .lightbox .lb-counter {
-  min-width: 4.5ch;
+  min-width: 5ch;
   text-align: center;
-  color: var(--gold-bright);
-  padding: 0 0.4rem;
-  font-family: var(--mono);
-  font-size: 0.78rem;
-  letter-spacing: 0.12em;
+  font-family: var(--display);
+  font-weight: 500;
+  font-size: 0.66rem;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--paper-bright);
+  padding-left: 0.32em;
 }
 
 /* ── QR card ────────────────────────────────────────────────── */

@@ -35,7 +35,7 @@
       var bs = localStorage.getItem('izzywedding-secondary');
       if (bp) document.documentElement.style.setProperty('--brand-primary', bp);
       if (bs) document.documentElement.style.setProperty('--brand-secondary', bs);
-      document.write('<link rel="stylesheet" id="universe" href="/themes/' + name + '.css">');
+      document.write('<link rel="stylesheet" id="universe" href="/themes/' + name + '.css?v=3">');
     })();
   </script>
 
@@ -209,8 +209,12 @@
         return btn;
       };
       filtersEl.appendChild(mkChip('all', 'All'));
-      const seen = new Set();
-      events.forEach((ev) => { seen.add(ev.slug); filtersEl.appendChild(mkChip(ev.slug, ev.label)); });
+      const seen = new Set(['all']);   // the "All" chip above is the only one
+      events.forEach((ev) => {
+        if (seen.has(ev.slug)) return;  // skip a config "all" so it isn't duplicated
+        seen.add(ev.slug);
+        filtersEl.appendChild(mkChip(ev.slug, ev.label));
+      });
       Object.keys(counts).forEach((slug) => {
         if (slug === 'all' || seen.has(slug)) return;
         filtersEl.appendChild(mkChip(slug, slug));
