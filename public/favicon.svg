@@ -1,25 +1,26 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <rect width="32" height="32" rx="6" fill="#0e3b2a"/>
-  <circle cx="16" cy="16" r="13.5" fill="none" stroke="#b08948" stroke-width="0.5"/>
-  <circle cx="16" cy="16" r="11.5" fill="none" stroke="#e2d3b3" stroke-width="0.4"/>
+  <!-- Terracotta seal — matches the manuscript palette (--brand-primary). -->
+  <rect width="32" height="32" rx="6" fill="#c2531f"/>
+  <circle cx="16" cy="16" r="13.5" fill="none" stroke="#e6a06b" stroke-width="0.5"/>
+  <circle cx="16" cy="16" r="11.5" fill="none" stroke="#f3e6d2" stroke-width="0.4"/>
 
-  <!-- I (thicker variant for 32px clarity) -->
-  <g fill="#d4af6b">
+  <!-- I (cream, seriffed) -->
+  <g fill="#fbe6d3">
     <rect x="8.4" y="11" width="1.4" height="10"/>            <!-- stem -->
     <rect x="6.4" y="10.6" width="5.4" height="0.7"/>         <!-- top serif -->
     <rect x="6.4" y="20.7" width="5.4" height="0.7"/>         <!-- bottom serif -->
   </g>
 
-  <!-- 8-point star -->
-  <g fill="#d4af6b">
+  <!-- 8-point star — gold accent (--brand-secondary) -->
+  <g fill="#e6a06b">
     <rect x="15.3" y="14" width="1.4" height="4"/>
     <rect x="15.3" y="14" width="1.4" height="4" transform="rotate(45 16 16)"/>
   </g>
 
-  <!-- A (thicker variant for clarity) -->
-  <g fill="#d4af6b">
-    <polygon points="22.4,11 22.9,11 21,21 20.1,21"/>          <!-- left thin -->
-    <polygon points="22.4,11 22.9,11 25.2,21 23.9,21"/>        <!-- right thicker -->
-    <rect x="20.7" y="17.4" width="3.7" height="0.7"/>         <!-- crossbar -->
+  <!-- D (cream, seriffed) -->
+  <g fill="#fbeeda">
+    <path fill-rule="evenodd" d="M20.6 11 L22.4 11 C24.4 11 25.5 12.8 25.5 16 C25.5 19.2 24.4 21 22.4 21 L20.6 21 Z M22.1 12.6 L22.4 12.6 C23.6 12.6 24.0 14 24.0 16 C24.0 18 23.6 19.4 22.4 19.4 L22.1 19.4 Z"/>
+    <rect x="19.6" y="10.6" width="3.0" height="0.7"/>        <!-- top serif -->
+    <rect x="19.6" y="20.7" width="3.0" height="0.7"/>        <!-- bottom serif -->
   </g>
 </svg>
