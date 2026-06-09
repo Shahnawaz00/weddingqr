@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#0c0a08" />
+  <meta name="theme-color" content="#f9ede1" />
   <title>Wedding</title>
   <meta name="description" content="A celebration. Share your moments with us." />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
@@ -21,9 +21,9 @@
        fallback typography at first paint. -->
   <style>
     html, body { margin: 0; padding: 0; min-height: 100%; font-family: 'Cormorant Garamond', 'Times New Roman', serif; }
-    body { background: #0c0a08; color: #e8dfc8; }
-    html[data-universe="manuscript"] body { background: #f8f4ea; color: #0e1a13; }
-    html[data-universe="garden"]     body { background: #faf4ea; color: #6b3a32; }
+    body { background: #f3e3ce; color: #3a2210; }
+    html[data-universe="manuscript"] body { background: #f9ede1; color: #471e09; }
+    html[data-universe="garden"]     body { background: #f8ecdc; color: #5a2e18; }
   </style>
 
   <!-- Synchronous universe selection — runs before any subsequent
@@ -38,12 +38,18 @@
     (function () {
       var params = new URLSearchParams(location.search);
       var urlU = params.get('theme') || params.get('universe');
-      var stored = localStorage.getItem('izzywedding-universe');
       var AVAIL = ['cinema', 'manuscript', 'garden'];
-      var name = (urlU && AVAIL.indexOf(urlU) >= 0) ? urlU
-               : (stored && AVAIL.indexOf(stored) >= 0) ? stored
-               : 'cinema';
+      // FINALIZED to Manuscript. A theme saved during earlier switching is
+      // intentionally ignored so the locked theme always loads; only an
+      // explicit ?theme= override (for dev) can change it.
+      var name = (urlU && AVAIL.indexOf(urlU) >= 0) ? urlU : 'manuscript';
       document.documentElement.setAttribute('data-universe', name);
+      // Restore a saved custom palette before the theme CSS link is
+      // written, so the very first styled paint uses the guest's colours.
+      var bp = localStorage.getItem('izzywedding-primary');
+      var bs = localStorage.getItem('izzywedding-secondary');
+      if (bp) document.documentElement.style.setProperty('--brand-primary', bp);
+      if (bs) document.documentElement.style.setProperty('--brand-secondary', bs);
       document.write('<link rel="stylesheet" id="universe" href="/themes/' + name + '.css">');
     })();
   </script>
@@ -68,32 +74,21 @@
         <span class="ampersand">&amp;</span>
         <span class="name" id="groomName">—</span>
       </h1>
-      <p class="blessing rise rise-4" lang="ar" dir="rtl">بَارَكَ ٱللَّٰهُ لَكُمَا وَبَارَكَ عَلَيْكُمَا</p>
+      <p class="blessing rise rise-4" lang="ar" dir="rtl">اللَّهُمَّ بَارِكْ لَهُمَا وَبَارِكْ عَلَيْهِمَا وَاجْمَعْ بَيْنَهُمَا فِي خَيْرٍ</p>
+      <p class="blessing-translit rise rise-5">O Allah, bless them, and bless their union, and bring them together in goodness</p>
       <p class="meta-combined rise rise-5">
         <span id="weddingDate">—</span><span class="sep" id="venueSep">—</span><span class="venue" id="weddingVenue">—</span>
       </p>
       <p class="meta-hijri rise rise-5" id="hijriLine"></p>
       <p class="tagline rise rise-6" id="tagline">—</p>
       <div class="btn-row rise rise-6">
-        <a class="btn btn-primary" href="/upload.html">Add a moment</a>
+        <a class="btn btn-primary" href="/upload.html">Upload</a>
         <a class="link-elegant" href="/gallery.html">View the gallery</a>
       </div>
     </div>
 
     <div class="foot fade-late">
-      <img class="seal" src="/monogram.svg" alt="Izzy and Adam monogram" />
-      <p class="hashtag" id="hashtag"></p>
-      <a class="meta-link" href="/qr.html">Print QR card</a>
-
-      <div class="theme-picker no-print" aria-label="Theme">
-        <p class="theme-picker-label">Themes</p>
-        <div class="theme-swatches">
-          <button class="theme-swatch" data-theme="cinema"     aria-label="Cinema"     type="button"><span class="swatch-inner" style="--a:#0c0a08;--b:#c25a2a"></span></button>
-          <button class="theme-swatch" data-theme="manuscript" aria-label="Manuscript" type="button"><span class="swatch-inner" style="--a:#f3ead0;--b:#14336e"></span></button>
-          <button class="theme-swatch" data-theme="garden"     aria-label="Garden"     type="button"><span class="swatch-inner" style="--a:#faf4ea;--b:#7a8b6e"></span></button>
-        </div>
-        <p class="theme-picker-name" id="themeName">Cinema</p>
-      </div>
+      <a class="meta-link no-print" href="/qr.html">Print QR card</a>
     </div>
   </div>
 
@@ -111,7 +106,6 @@
     if (dateText && venueText) sep.textContent = '·';
     else sep.style.display = 'none';
     document.getElementById('tagline').textContent = c.tagline || '';
-    document.getElementById('hashtag').textContent = c.hashtag || '';
 
     const hijriEl = document.getElementById('hijriLine');
     if (c.hijriDate) hijriEl.textContent = c.hijriDate.toUpperCase();

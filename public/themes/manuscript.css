@@ -17,28 +17,38 @@
 /* Fonts loaded from HTML <link>. */
 
 :root {
-  --paper:        #f8f4ea;
-  --paper-deep:   #ede0c4;
-  --paper-bright: #fdf9ee;
-  --paper-mute:   #d8caa6;
+  /* ── Brand tokens — FINALIZED to the Terracotta palette (locked).
+        Every shade below derives from these via color-mix; primary fills
+        the old structural-emerald role, secondary the old gold. ──── */
+  --brand-primary:   #c2531f;
+  --brand-secondary: #e6a06b;
 
-  --ink:          #0e1a13;
-  --ink-mute:     #5a6a5f;
+  --paper:        color-mix(in oklab, #fdf8f0 93%, var(--brand-primary));
+  --paper-deep:   color-mix(in oklab, #f3e6d2 88%, var(--brand-primary));
+  --paper-bright: color-mix(in oklab, #fffaf3 96%, var(--brand-primary));
+  --paper-mute:   color-mix(in oklab, #e9d6ba 80%, var(--brand-primary));
 
-  --emerald:      #0b4a3a;
-  --emerald-glow: #135e4a;
-  --emerald-deep: #073529;
+  --ink:          color-mix(in oklab, #241003 78%, var(--brand-primary));
+  --ink-mute:     color-mix(in oklab, #6a4a32 60%, var(--brand-primary));
 
-  --gold:         #c89a3a;
-  --gold-bright:  #e3b95c;
-  --gold-deep:    #9c7a2c;
+  --emerald:      var(--brand-primary);
+  --emerald-glow: color-mix(in oklab, var(--brand-primary), #fffaf3 18%);
+  --emerald-deep: color-mix(in oklab, var(--brand-primary), #1a0c02 32%);
+
+  --gold:         var(--brand-secondary);
+  --gold-bright:  color-mix(in oklab, var(--brand-secondary), #fffaf3 24%);
+  --gold-deep:    color-mix(in oklab, var(--brand-secondary), #1a0c02 22%);
 
   --error:        #8c3a3a;
 
   --display:       'Cinzel', 'Trajan Pro', 'Times New Roman', serif;
   --body:          'Cormorant Garamond', 'Times New Roman', serif;
+  /* Arabic locked to Amiri (Cinema's Arabic face) for all Arabic — the
+     flowing naskh reads quieter than Reem Kufi's wide kufi. */
   --arabic:        'Amiri', serif;
-  --arabic-display:'Reem Kufi', 'Amiri', serif;
+  --arabic-display:'Amiri', serif;
+  /* Fraunces is kept ONLY for the hero names + "&" (see .hero h1). */
+  --hero-name:     'Fraunces', 'Times New Roman', serif;
   --mono:          ui-monospace, monospace;
 
   --pad:          1.5rem;
@@ -102,9 +112,9 @@ body::after {
   z-index: 0;
   background-image: linear-gradient(115deg,
     transparent 32%,
-    rgba(200, 154, 58, 0.06) 44%,
-    rgba(227, 185, 92, 0.14) 50%,
-    rgba(200, 154, 58, 0.06) 56%,
+    color-mix(in srgb, var(--brand-secondary) 6%, transparent) 44%,
+    color-mix(in srgb, var(--brand-secondary) 14%, transparent) 50%,
+    color-mix(in srgb, var(--brand-secondary) 6%, transparent) 56%,
     transparent 68%);
   background-size: 280% 100%;
   background-position: 110% 50%;
@@ -161,14 +171,7 @@ body::after {
 
 /* ── Single sacred star above the Bismillah ──────────────────── */
 .bismillah-star {
-  display: block;
-  width: 18px;
-  height: 18px;
-  margin: 1rem auto 1.5rem;
-  background: var(--gold);
-  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
-  opacity: 0;
-  animation: ms-bloom 800ms var(--ease) 100ms forwards;
+  display: none;   /* top star removed per request (ceremony star unaffected) */
 }
 
 /* ── Bismillah — monumental Arabic, generous space, no frame ──── */
@@ -231,6 +234,16 @@ body::after {
 .eyebrow-label::after,
 .eyebrow::before,
 .eyebrow::after { display: none; }
+/* Gallery eyebrow ("A collection of your moments") is long — tighten it
+   so it fits a phone width and give it room below the names. */
+.eyebrow {
+  font-size: 0.6rem;
+  letter-spacing: 0.26em;
+  padding-left: 0.26em;
+  margin: 1.5rem auto 1.75rem;
+  max-width: 22ch;
+  text-wrap: balance;
+}
 
 /* ── Hero ───────────────────────────────────────────────────── */
 .hero {
@@ -238,17 +251,18 @@ body::after {
   padding: 0.5rem 0 1rem;
 }
 .hero h1 {
-  font-family: var(--display);
-  font-weight: 600;
+  font-family: var(--hero-name);   /* Fraunces — Cinema's name type, kept only here */
+  font-weight: 700;
+  font-variation-settings: "opsz" 144, "SOFT" 18;
+  font-optical-sizing: auto;
   color: var(--ink);
   margin: 0;
-  line-height: 1.02;
-  letter-spacing: 0.04em;
-  /* Cinzel monumental — names dominate the composition. Mobile gets
-     ~75–80px on a 400px viewport; desktop caps at 7.5rem. */
-  font-size: clamp(3.8rem, 19vw, 7.5rem);
-  text-transform: uppercase;
-  padding-left: 0.04em;
+  line-height: 0.9;
+  letter-spacing: -0.025em;
+  text-align: center;
+  /* Fraunces monumental — names dominate, matching Cinema's hero scale. */
+  font-size: clamp(4.6rem, 23vw, 9rem);
+  text-transform: none;            /* mixed-case, as in the reference */
   overflow-wrap: anywhere;
 }
 .hero h1 .name {
@@ -258,27 +272,25 @@ body::after {
 }
 .hero h1 .name:nth-of-type(1) { animation-delay: 700ms; }
 .hero h1 .name:nth-of-type(2) { animation-delay: 1100ms; }
-/* The Latin "&" is hidden; Arabic و (waw) is rendered via ::after. */
+/* The Latin "&" — italic Fraunces in the warm accent, a subordinate
+   joining mark centred between the names (Cinema's treatment). */
 .hero h1 .ampersand {
   display: block;
-  font-size: 0;
-  line-height: 0;
-  /* ~40% of name size so it sits as a subordinate joining mark */
-  height: clamp(2rem, 9vw, 3.6rem);
-  margin: 0.18em 0;
+  width: 100%;
+  text-align: center;
+  font-family: var(--hero-name);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 0.4em;
+  line-height: 1;
+  height: auto;
+  margin: 0.22em 0 0.02em;         /* nudge down — optically centre between the names */
+  padding-left: 0.14em;            /* optical-centre the italic glyph horizontally */
+  color: var(--gold);
   opacity: 0;
   animation: ms-bloom 700ms var(--ease) 900ms forwards;
 }
-.hero h1 .ampersand::after {
-  content: 'و';
-  font-family: var(--arabic-display);
-  font-weight: 600;
-  font-size: clamp(2rem, 9vw, 3.6rem);
-  line-height: 1;
-  color: var(--gold);
-  display: inline-block;
-  letter-spacing: 0;
-}
+.hero h1 .ampersand::after { content: none; }   /* drop the Arabic waw */
 
 /* Compact hero (upload / gallery / qr pages) */
 .hero h1.compact {
@@ -289,9 +301,11 @@ body::after {
 .hero h1.compact .name:nth-of-type(2) { animation-delay: 400ms; }
 .hero h1.compact .ampersand {
   display: inline-block;
+  width: auto;              /* reset the block-hero width:100% so names stay on one line */
   height: auto;
-  margin: 0 0.3em;
-  vertical-align: -0.18em;
+  padding-left: 0;          /* reset the block-hero optical nudge */
+  margin: 0 0.28em;
+  vertical-align: -0.02em;
   animation-delay: 300ms;
 }
 .hero h1.compact .ampersand::after {
@@ -302,15 +316,17 @@ body::after {
 .blessing {
   display: block;
   font-family: var(--arabic-display);
-  font-weight: 500;
-  font-size: clamp(1.35rem, 4.5vw, 1.85rem);
+  font-weight: 400;
+  /* Subtler than before — Amiri is narrower than Reem Kufi, so this
+     no longer runs edge-to-edge. */
+  font-size: clamp(1.1rem, 3.4vw, 1.45rem);
   color: var(--gold-deep);
   text-align: center;
-  margin: 2.5rem auto 0;
+  margin: 2.25rem auto 0;
   padding: 0;
-  max-width: 28ch;
-  line-height: 1.6;
-  letter-spacing: 0.015em;
+  max-width: 24ch;
+  line-height: 1.95;               /* room for Amiri's harakat */
+  letter-spacing: 0;
   position: relative;
   text-wrap: balance;
 }
@@ -324,6 +340,18 @@ body::after {
   background: var(--gold);
   margin: 1rem auto;
   opacity: 0.8;
+}
+/* Translation of the dua — a quiet italic line beneath it. */
+.blessing-translit {
+  font-family: var(--body);
+  font-style: italic;
+  font-size: 0.98rem;
+  color: var(--ink-mute);
+  text-align: center;
+  max-width: 36ch;
+  margin: 0.25rem auto 0;
+  line-height: 1.55;
+  text-wrap: balance;
 }
 
 /* ── Meta line — quiet colophon ─────────────────────────────── */
@@ -435,23 +463,23 @@ body::after {
   position: relative;
   /* Engraved seal: paper gap + gold ring. Two rings, not six. */
   box-shadow:
-    inset 0 1px 0 rgba(255, 250, 235, 0.10),
+    inset 0 1px 0 color-mix(in srgb, var(--paper-bright) 10%, transparent),
     inset 0 -1px 0 rgba(0, 0, 0, 0.18),
     0 0 0 1px var(--emerald),
     0 0 0 4px var(--paper),
     0 0 0 5px var(--gold),
-    0 12px 28px rgba(11, 74, 58, 0.18);
+    0 12px 28px color-mix(in srgb, var(--brand-primary) 18%, transparent);
 }
 .btn-primary:hover {
   background: var(--emerald-glow);
   transform: translateY(-1px);
   box-shadow:
-    inset 0 1px 0 rgba(255, 250, 235, 0.12),
+    inset 0 1px 0 color-mix(in srgb, var(--paper-bright) 12%, transparent),
     inset 0 -1px 0 rgba(0, 0, 0, 0.18),
     0 0 0 1px var(--emerald-glow),
     0 0 0 4px var(--paper),
     0 0 0 5px var(--gold-bright),
-    0 16px 36px rgba(11, 74, 58, 0.24);
+    0 16px 36px color-mix(in srgb, var(--brand-primary) 24%, transparent);
 }
 .btn-primary:active { transform: translateY(1px); }
 .btn-primary:focus-visible { outline: 1.5px solid var(--gold-bright); outline-offset: 8px; }
@@ -511,8 +539,8 @@ body::after {
   margin: 1.5rem 0;
   border-radius: 1px;
   box-shadow:
-    inset 0 1px 0 rgba(255, 250, 235, 0.65),
-    0 22px 52px rgba(11, 74, 58, 0.08);
+    inset 0 1px 0 color-mix(in srgb, var(--paper-bright) 65%, transparent),
+    0 22px 52px color-mix(in srgb, var(--brand-primary) 8%, transparent);
 }
 
 /* ── Dropzone ───────────────────────────────────────────────── */
@@ -692,7 +720,7 @@ input[type="file"] { display: none; }
   position: fixed;
   left: 0; right: 0; bottom: 0;
   padding: 0.8rem var(--pad) calc(0.8rem + var(--safe-bottom));
-  background: rgba(248, 244, 234, 0.96);
+  background: color-mix(in srgb, var(--paper) 96%, transparent);
   backdrop-filter: blur(10px);
   border-top: 0.5px solid var(--gold);
   z-index: 50;
@@ -799,7 +827,7 @@ input[type="file"] { display: none; }
 .gallery a:hover {
   transform: translateY(-3px);
   border-color: var(--emerald);
-  box-shadow: 0 12px 26px rgba(11, 74, 58, 0.16);
+  box-shadow: 0 12px 26px color-mix(in srgb, var(--brand-primary) 16%, transparent);
   z-index: 2;
 }
 .gallery a img, .gallery a video {
@@ -838,7 +866,7 @@ input[type="file"] { display: none; }
 /* ── Lightbox ───────────────────────────────────────────────── */
 .lightbox {
   position: fixed; inset: 0;
-  background: rgba(11, 74, 58, 0.95);
+  background: color-mix(in srgb, var(--brand-primary) 95%, transparent);
   backdrop-filter: blur(18px);
   display: none;
   align-items: center;
@@ -888,7 +916,7 @@ input[type="file"] { display: none; }
   outline: 0.5px solid var(--gold-deep);
   outline-offset: 6px;
   text-align: center;
-  box-shadow: 0 28px 72px rgba(11, 74, 58, 0.14), 0 6px 18px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 28px 72px color-mix(in srgb, var(--brand-primary) 14%, transparent), 0 6px 18px rgba(0, 0, 0, 0.05);
 }
 .qr-card .bismillah {
   font-size: 1.4rem;
@@ -910,20 +938,19 @@ input[type="file"] { display: none; }
   line-height: 1.2;
   padding-left: 0.1em;
 }
+/* The Latin italic "&" — same joining mark as the home hero. */
 .qr-card h2 .ampersand {
-  font-size: 0;
-  display: inline-block;
-  vertical-align: -0.18em;
-  margin: 0 0.18em;
-}
-.qr-card h2 .ampersand::after {
-  content: 'و';
-  font-family: var(--arabic-display);
-  font-weight: 600;
+  font-family: var(--hero-name);
+  font-style: italic;
+  font-weight: 400;
   font-size: clamp(1.3rem, 5vw, 1.8rem);
   color: var(--gold);
   display: inline-block;
+  vertical-align: -0.02em;
+  margin: 0 0.16em;
+  text-transform: none;
 }
+.qr-card h2 .ampersand::after { content: none; }   /* drop the Arabic waw */
 .qr-card .scan-prompt {
   font-family: var(--body);
   font-style: italic;
@@ -953,20 +980,12 @@ input[type="file"] { display: none; }
   color: var(--ink-mute);
   margin: 0.85rem 0 0.4rem;
   display: inline-block;
-  padding: 0 0.6rem;
+  padding: 0;
   position: relative;
-  padding-left: calc(0.6rem + 0.42em);
+  text-indent: 0.42em;   /* offset trailing letter-spacing so it reads centred */
 }
-.qr-card .visit-label::before, .qr-card .visit-label::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  width: 28px;
-  height: 1px;
-  background: var(--gold);
-}
-.qr-card .visit-label::before { right: 100%; }
-.qr-card .visit-label::after  { left: 100%; }
+/* Flanking hairlines removed — they read as a tacky cut line (esp. in print). */
+.qr-card .visit-label::before, .qr-card .visit-label::after { content: none; }
 .qr-card .visit-url {
   font-family: var(--mono);
   font-size: 0.72rem;
@@ -1032,21 +1051,12 @@ input[type="file"] { display: none; }
 /* ── Foot ───────────────────────────────────────────────────── */
 .foot {
   text-align: center;
-  margin-top: 4rem;
-  padding-top: 3rem;
+  margin-top: 3.5rem;
+  padding-top: 1rem;
   position: relative;
 }
-/* Single gold star at the top of the foot — only ornament here */
-.foot::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 50%;
-  transform: translateX(-50%);
-  width: 12px;
-  height: 12px;
-  background: var(--gold);
-  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
-}
+/* Foot star removed — the finalized foot is just the subtle print link. */
+.foot::before { content: none; }
 .foot .seal {
   width: 56px; height: 56px;
   margin: 0 auto 1rem;
@@ -1133,7 +1143,7 @@ input[type="file"] { display: none; }
 }
 .theme-swatch:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 14px rgba(11, 74, 58, 0.14);
+  box-shadow: 0 6px 14px color-mix(in srgb, var(--brand-primary) 14%, transparent);
 }
 .theme-swatch.is-active { outline: 1px solid var(--emerald); outline-offset: 2px; }
 .theme-swatch.is-disabled { cursor: not-allowed; opacity: 0.4; }
@@ -1148,7 +1158,7 @@ input[type="file"] { display: none; }
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--paper-bright);
-  background: rgba(11, 74, 58, 0.9);
+  background: color-mix(in srgb, var(--brand-primary) 90%, transparent);
   padding: 1px 5px;
   z-index: 2;
 }
@@ -1156,7 +1166,7 @@ input[type="file"] { display: none; }
 .swatch-inner {
   display: block;
   width: 100%; height: 100%;
-  background: linear-gradient(180deg, var(--a, #f8f4ea) 0% 60%, var(--b, #0b4a3a) 60% 100%);
+  background: linear-gradient(180deg, var(--a, #fdf1e2) 0% 60%, var(--b, #a8480f) 60% 100%);
 }
 .theme-picker-name {
   font-family: var(--body);
@@ -1198,39 +1208,49 @@ input[type="file"] { display: none; }
 
 /* ── Print ──────────────────────────────────────────────────── */
 @media print {
-  @page { size: A4; margin: 0; }
-  html, body { background: var(--paper) !important; background-image: none !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  /* Single card, perfectly fitting one A5 page (148 × 210 mm), full-bleed. */
+  @page { size: A5; margin: 0; }
+  html, body { width: 148mm; height: 210mm; margin: 0; padding: 0; overflow: hidden; background: var(--paper) !important; background-image: none !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   body * { visibility: hidden; }
+  /* Collapse the normal-flow page so only the absolutely-placed card
+     occupies the sheet — otherwise the tall .container spills to page 2. */
+  .container { display: block !important; min-height: 0 !important; height: auto !important; padding: 0 !important; margin: 0 !important; }
   .qr-stage, .qr-stage * { visibility: visible; }
   .qr-stage {
-    position: absolute;
-    left: 50%; top: 50%;
-    transform: translate(-50%, -50%);
+    position: fixed;
+    inset: 0;
+    transform: none;
     padding: 0; margin: 0;
+    width: 148mm;
+    height: 210mm;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
   .qr-card {
-    width: 105mm;
-    height: 148mm;
+    width: 148mm;
+    height: 210mm;
+    box-sizing: border-box;
     max-width: none;
-    padding: 8mm;
+    padding: 16mm 14mm;
     box-shadow: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     background: var(--paper-bright) !important;
     outline-color: var(--gold-deep) !important;
-    outline-offset: 4px;
+    outline-offset: -8mm;          /* frame sits INSIDE the sheet, no overflow */
   }
-  .qr-card .bismillah { font-size: 1.1rem; margin: 0 auto 0.7rem; }
-  .qr-card h2 { font-size: 1.7rem; line-height: 1.1; }
-  .qr-card .scan-prompt { font-size: 0.85rem; margin: 0.6rem 0 0; }
-  .qr-frame { margin: 0.8rem auto 0.5rem; padding: 1.5mm; }
-  .qr-frame img, .qr-frame canvas { width: 50mm !important; height: 50mm !important; }
-  .qr-card .visit-label { font-size: 0.5rem; }
-  .qr-card .visit-label::before, .qr-card .visit-label::after { width: 20px; }
-  .qr-card .visit-url { font-size: 0.62rem; margin: 0 0 0.5rem; line-height: 1.35; }
-  .qr-card .seal-wrap { margin-top: auto; margin-bottom: 0.35rem; }
-  .qr-card .seal { width: 14mm; height: 14mm; }
-  .qr-card .seal-wrap::before, .qr-card .seal-wrap::after { max-width: 22px; }
-  .qr-card .stamp { font-size: 0.55rem; }
-  .qr-card .stamp-hijri { font-size: 0.5rem; }
+  .qr-card .bismillah { font-size: 1.5rem; margin: 0 auto 1rem; }
+  .qr-card h2 { font-size: 2.4rem; line-height: 1.08; }
+  .qr-card .scan-prompt { font-size: 1.1rem; margin: 0.9rem 0 0; }
+  .qr-frame { margin: 1.4rem auto 0.8rem; padding: 2mm; }
+  .qr-frame img, .qr-frame canvas { width: 64mm !important; height: 64mm !important; }
+  .qr-card .visit-label { font-size: 0.65rem; }
+  .qr-card .visit-label::before, .qr-card .visit-label::after { width: 28px; }
+  .qr-card .visit-url { font-size: 0.82rem; margin: 0 0 0.7rem; line-height: 1.35; }
+  .qr-card .stamp { font-size: 0.72rem; }
+  .qr-card .stamp-hijri { font-size: 0.62rem; }
   .cropmark { display: block; }
   .no-print { display: none !important; }
 }
@@ -1247,3 +1267,78 @@ input[type="file"] { display: none; }
     transform: none !important;
   }
 }
+/* ════════════════════════════════════════════════════════════════
+   Palette picker — recolours every universe live from two source
+   colours. Theme-agnostic: styled entirely from --brand-* and
+   currentColor, so this same block adapts to each universe. ────── */
+.palette-picker { margin-top: 1.9rem; text-align: center; }
+.palette-row {
+  display: inline-flex;
+  gap: 1.5rem;
+  justify-content: center;
+  margin-bottom: 1.1rem;
+}
+.palette-control {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  position: relative;
+}
+.palette-dot {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, currentColor 28%, transparent);
+  box-shadow: 0 3px 12px color-mix(in srgb, var(--brand-primary) 35%, transparent);
+  transition: transform 180ms var(--ease, ease);
+}
+.palette-control:hover .palette-dot { transform: scale(1.08); }
+#primaryDot   { background: var(--brand-primary); }
+#secondaryDot { background: var(--brand-secondary); }
+.palette-name {
+  font-family: var(--body);
+  font-size: 0.5rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  opacity: 0.65;
+}
+.palette-control input[type="color"] {
+  position: absolute;
+  inset: 0;
+  width: 100%; height: 100%;
+  margin: 0; padding: 0; border: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.palette-presets {
+  display: inline-flex;
+  gap: 0.6rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  max-width: 260px;
+  margin: 0 auto 1rem;
+}
+.palette-preset {
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, currentColor 22%, transparent);
+  cursor: pointer;
+  padding: 0;
+  background: linear-gradient(135deg, var(--pp) 0 50%, var(--ps) 50% 100%);
+  transition: transform 160ms var(--ease, ease);
+}
+.palette-preset:hover { transform: translateY(-2px) scale(1.06); }
+.palette-reset {
+  font-family: var(--body);
+  font-size: 0.5rem;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  background: none;
+  border: 0;
+  color: inherit;
+  opacity: 0.5;
+  cursor: pointer;
+  padding: 0.3rem 0.5rem;
+}
+.palette-reset:hover { opacity: 0.85; }

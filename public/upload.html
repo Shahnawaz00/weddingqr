@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#0c0a08" />
-  <title>Add a moment</title>
+  <meta name="theme-color" content="#f9ede1" />
+  <title>Upload</title>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -14,21 +14,27 @@
 
   <style>
     html, body { margin: 0; padding: 0; min-height: 100%; font-family: 'Cormorant Garamond', 'Times New Roman', serif; }
-    body { background: #0c0a08; color: #e8dfc8; }
-    html[data-universe="manuscript"] body { background: #f8f4ea; color: #0e1a13; }
-    html[data-universe="garden"]     body { background: #faf4ea; color: #6b3a32; }
+    body { background: #f3e3ce; color: #3a2210; }
+    html[data-universe="manuscript"] body { background: #f9ede1; color: #471e09; }
+    html[data-universe="garden"]     body { background: #f8ecdc; color: #5a2e18; }
   </style>
 
   <script>
     (function () {
       var params = new URLSearchParams(location.search);
       var urlU = params.get('theme') || params.get('universe');
-      var stored = localStorage.getItem('izzywedding-universe');
       var AVAIL = ['cinema', 'manuscript', 'garden'];
-      var name = (urlU && AVAIL.indexOf(urlU) >= 0) ? urlU
-               : (stored && AVAIL.indexOf(stored) >= 0) ? stored
-               : 'cinema';
+      // FINALIZED to Manuscript. A theme saved during earlier switching is
+      // intentionally ignored so the locked theme always loads; only an
+      // explicit ?theme= override (for dev) can change it.
+      var name = (urlU && AVAIL.indexOf(urlU) >= 0) ? urlU : 'manuscript';
       document.documentElement.setAttribute('data-universe', name);
+      // Restore a saved custom palette before the theme CSS link is
+      // written, so the very first styled paint uses the guest's colours.
+      var bp = localStorage.getItem('izzywedding-primary');
+      var bs = localStorage.getItem('izzywedding-secondary');
+      if (bp) document.documentElement.style.setProperty('--brand-primary', bp);
+      if (bs) document.documentElement.style.setProperty('--brand-secondary', bs);
       document.write('<link rel="stylesheet" id="universe" href="/themes/' + name + '.css">');
     })();
   </script>
@@ -74,7 +80,7 @@
       <p id="status" role="status"></p>
 
       <div class="btn-row desktop-only-cta">
-        <button class="btn btn-primary" id="uploadBtnDesktop" disabled>Send these home</button>
+        <button class="btn btn-primary" id="uploadBtnDesktop" disabled>Upload</button>
         <a class="link-elegant" href="/gallery.html">View the gallery</a>
       </div>
 
@@ -85,10 +91,10 @@
 
     <div class="ceremony" id="ceremony" aria-live="polite">
       <span class="bismillah-star" aria-hidden="true"></span>
-      <p class="ceremony-msg" id="ceremonyMsg">Terima kasih — your moment is with us.</p>
+      <p class="ceremony-msg" id="ceremonyMsg">Uploaded — thank you!</p>
       <div class="btn-row ceremony-sub">
-        <a class="btn btn-primary" href="/gallery.html">View what's been shared</a>
-        <button class="link-elegant" type="button" id="addMoreBtn">Add another</button>
+        <a class="btn btn-primary" href="/gallery.html">View gallery</a>
+        <button class="link-elegant" type="button" id="addMoreBtn">Upload more</button>
       </div>
     </div>
 
@@ -98,7 +104,7 @@
   </div>
 
   <div class="sticky-cta" id="stickyCta">
-    <button class="btn btn-primary" id="uploadBtn" disabled>Send these home</button>
+    <button class="btn btn-primary" id="uploadBtn" disabled>Upload</button>
   </div>
 
   <script>
@@ -106,7 +112,7 @@
     document.getElementById('brideTop').textContent = c.brideName || '';
     document.getElementById('groomTop').textContent = c.groomName || '';
     document.getElementById('prompt').textContent = c.uploadPrompt || '';
-    document.title = `Add a moment — ${c.brideName} & ${c.groomName}`;
+    document.title = `Upload — ${c.brideName} & ${c.groomName}`;
 
     const events = Array.isArray(c.events) ? c.events : [];
     if (events.length > 0) {
@@ -187,7 +193,7 @@
       );
       selected = selected.concat(arr).slice(0, 30);
       renderThumbs();
-      if (arr.length) setStatus(`${selected.length} ${selected.length === 1 ? 'moment' : 'moments'} ready to share.`);
+      if (arr.length) setStatus(`${selected.length} ${selected.length === 1 ? 'file' : 'files'} ready to upload.`);
       retryRow.style.display = 'none';
     }
 
@@ -204,8 +210,8 @@
 
     function showCeremony(count) {
       const msg = count === 1
-        ? 'Terima kasih — your moment is with us.'
-        : `Terima kasih — your ${count} moments are with us.`;
+        ? 'Uploaded — thank you!'
+        : `${count} files uploaded — thank you!`;
       document.getElementById('ceremonyMsg').textContent = msg;
       uploadCard.style.display = 'none';
       stickyCta.classList.remove('is-visible');
@@ -232,7 +238,7 @@
       uploadBtnD.disabled = true;
       progress.classList.add('is-active');
       progressBar.style.width = '0%';
-      setStatus('Sending…');
+      setStatus('Uploading…');
 
       const sender = senderEl.value.trim();
       if (sender) localStorage.setItem('izzywedding-sender', sender);
@@ -260,7 +266,7 @@
           showCeremony(n);
           selected = [];
         } else {
-          let msg = "We couldn't deliver those — let's try once more.";
+          let msg = 'Upload failed — try again.';
           try { msg = JSON.parse(xhr.responseText).error || msg; } catch {}
           setStatus(msg, true);
           retryRow.style.display = '';
@@ -271,7 +277,7 @@
       };
       xhr.onerror = () => {
         progress.classList.remove('is-active', 'is-indeterminate');
-        setStatus('Network slowed down — your photos are still selected. Try again?', true);
+        setStatus('Connection dropped — your files are still selected. Try again.', true);
         retryRow.style.display = '';
         uploadBtn.disabled = false;
         uploadBtnD.disabled = false;

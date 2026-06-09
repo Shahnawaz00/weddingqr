@@ -11,7 +11,7 @@
 // ════════════════════════════════════════════════════════════════
 (function () {
   const KEY = 'izzywedding-universe';
-  const DEFAULT = 'cinema';
+  const DEFAULT = 'manuscript';
   const UNIVERSES = ['cinema', 'manuscript', 'garden'];
   const AVAILABLE = ['cinema', 'manuscript', 'garden'];
   const NAMES = {
@@ -40,6 +40,9 @@
       localStorage.setItem(KEY, name);
       const nameEl = document.getElementById('themeName');
       if (nameEl) nameEl.textContent = NAMES[name];
+      // If the guest hasn't set a custom palette, the new universe's
+      // default --brand-* applies — re-sync the picker inputs to it.
+      syncPaletteUI();
     };
     if (document.startViewTransition && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       document.startViewTransition(apply);
@@ -74,9 +77,100 @@
     });
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', wirePicker);
-  } else {
+  // ────────────────────────────────────────────────────────────────
+  //  Palette — two source colours (--brand-primary / --brand-secondary)
+  //  that every universe derives all its shades from via color-mix.
+  //  Setting them inline on <html> overrides each theme's :root default
+  //  and persists across pages + universe switches.
+  // ────────────────────────────────────────────────────────────────
+  const PKEY = 'izzywedding-primary';
+  const SKEY = 'izzywedding-secondary';
+  // Orange-lover presets — all orange-led, spanning red-orange to
+  // golden to earthy to refined so each lands differently per universe.
+  const PRESETS = [
+    { name: 'Sunset Blaze',  primary: '#e0701f', secondary: '#ffb24d' },
+    { name: 'Blood Orange',  primary: '#e8431f', secondary: '#ff8a5c' },
+    { name: 'Marigold',      primary: '#f2891b', secondary: '#ffc94d' },
+    { name: 'Terracotta',    primary: '#c2531f', secondary: '#e6a06b' },
+    { name: 'Tangerine Pop', primary: '#ff6a14', secondary: '#ffd07a' },
+    { name: 'Copper Ember',  primary: '#b86a2e', secondary: '#e09a4f' },
+  ];
+  const HEX6 = /^#[0-9a-f]{6}$/i;
+
+  function setBrand(primary, secondary, persist) {
+    const root = document.documentElement;
+    if (primary)   root.style.setProperty('--brand-primary', primary);
+    if (secondary) root.style.setProperty('--brand-secondary', secondary);
+    if (persist) {
+      if (primary)   localStorage.setItem(PKEY, primary);
+      if (secondary) localStorage.setItem(SKEY, secondary);
+    }
+    syncPaletteUI();
+  }
+
+  function clearBrand() {
+    const root = document.documentElement;
+    root.style.removeProperty('--brand-primary');
+    root.style.removeProperty('--brand-secondary');
+    localStorage.removeItem(PKEY);
+    localStorage.removeItem(SKEY);
+    syncPaletteUI();
+  }
+
+  function syncPaletteUI() {
+    const cs = getComputedStyle(document.documentElement);
+    const p = cs.getPropertyValue('--brand-primary').trim();
+    const s = cs.getPropertyValue('--brand-secondary').trim();
+    const pi = document.getElementById('primaryInput');
+    const si = document.getElementById('secondaryInput');
+    if (pi && HEX6.test(p)) pi.value = p;
+    if (si && HEX6.test(s)) si.value = s;
+  }
+
+  function wirePalette() {
+    const picker = document.querySelector('.palette-picker');
+    if (!picker) return;
+
+    // Restore a previously-saved custom palette (also done pre-paint in
+    // the <head> bootstrap; repeated here so the picker works even if a
+    // page lacks that snippet).
+    const sp = localStorage.getItem(PKEY);
+    const ss = localStorage.getItem(SKEY);
+    if (sp || ss) setBrand(sp, ss, false);
+
+    const presetWrap = document.getElementById('palettePresets');
+    if (presetWrap) {
+      PRESETS.forEach((preset) => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'palette-preset';
+        b.title = preset.name;
+        b.setAttribute('aria-label', preset.name);
+        b.style.setProperty('--pp', preset.primary);
+        b.style.setProperty('--ps', preset.secondary);
+        b.addEventListener('click', () => setBrand(preset.primary, preset.secondary, true));
+        presetWrap.appendChild(b);
+      });
+    }
+
+    const pi = document.getElementById('primaryInput');
+    const si = document.getElementById('secondaryInput');
+    if (pi) pi.addEventListener('input', (e) => setBrand(e.target.value, null, true));
+    if (si) si.addEventListener('input', (e) => setBrand(null, e.target.value, true));
+    const reset = document.getElementById('paletteReset');
+    if (reset) reset.addEventListener('click', clearBrand);
+
+    syncPaletteUI();
+  }
+
+  function init() {
     wirePicker();
+    wirePalette();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
   }
 })();

@@ -1,0 +1,8 @@
+# Cloudflare Pages headers. (Mirrors the cache rules from netlify.toml,
+# which Cloudflare does not read.)
+
+/themes/*
+  Cache-Control: public, max-age=604800, immutable
+
+/*.svg
+  Cache-Control: public, max-age=604800

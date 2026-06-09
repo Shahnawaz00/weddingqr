@@ -3,14 +3,14 @@
 //  Every page reads from this one config object.
 // ════════════════════════════════════════════════════════════════
 window.WEDDING_CONFIG = {
-  brideName: 'Izzy',
-  groomName: 'Adam',
-  date: '12 September 2026',
-  venue: 'Kuala Lumpur',
-  hashtag: '#IzzyAndAdam',
+  brideName: 'Izzati',
+  groomName: 'Danial',
+  date: '12 December 2026',
+  venue: 'Melbourne',
+  hashtag: '#IzzyAndDanial',
 
   // Optional welcome line shown under the names on the landing page.
-  tagline: 'We cannot wait to celebrate with you.',
+  // tagline: 'We cannot wait to celebrate with you.',
 
   // Shown on the upload + QR pages. Keep it short — it goes on a card.
   uploadPrompt: 'Share your photos & videos with us',
@@ -32,7 +32,7 @@ window.WEDDING_CONFIG = {
   //  an exact spelling (e.g. Bahasa Malaysia: "1 Rabiulawal 1448"),
   //  set it here and it'll be used verbatim.
   // ────────────────────────────────────────────────────────────
-  hijriDate: '',  // e.g. '1 Rabiulawal 1448' to override auto-compute
+  hijriDate: '3 Rajab 1448',  // e.g. '1 Rabiulawal 1448' to override auto-compute
 
   // ────────────────────────────────────────────────────────────
   //  Events / albums
@@ -45,7 +45,6 @@ window.WEDDING_CONFIG = {
   //  `label` = what guests see.
   // ────────────────────────────────────────────────────────────
   events: [
-    { slug: 'berinai',     label: 'Berinai'      },
     { slug: 'akad-nikah',  label: 'Akad Nikah'   },
     { slug: 'bersanding',  label: 'Bersanding'   },
     { slug: 'lain-lain',   label: 'Lain-lain'    },

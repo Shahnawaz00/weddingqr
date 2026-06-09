@@ -12,18 +12,27 @@
 /* Fonts loaded from index.html via a single combined <link>. */
 
 :root {
-  --cream:        #faf4ea;
-  --cream-deep:   #f0e8d6;
-  --cream-white:  #fdf9f0;
-  --sage:         #7a8b6e;
-  --sage-deep:    #5d6c54;
-  --sage-soft:    #b3c0a6;
-  --blush:        #d4a3a3;
-  --blush-deep:   #b87c7c;
-  --blush-soft:   #ecc8c8;
-  --rosewood:     #6b3a32;
-  --rosewood-glow:#8a4d42;
-  --ink-soft:     #4a3d35;
+  /* ── Brand tokens — the palette picker drives these two; every
+        shade below derives via color-mix. Primary fills the old
+        sage role, secondary the old blush. ─────────────────────── */
+  --brand-primary:   #bf661f;
+  --brand-secondary: #e0a05f;
+
+  --cream:        color-mix(in oklab, #fdf6ec 93%, var(--brand-primary));
+  --cream-deep:   color-mix(in oklab, #f5e8d6 89%, var(--brand-primary));
+  --cream-white:  color-mix(in oklab, #fffaf3 96%, var(--brand-primary));
+
+  --sage:         var(--brand-primary);
+  --sage-deep:    color-mix(in oklab, var(--brand-primary), #1a0c02 28%);
+  --sage-soft:    color-mix(in oklab, var(--brand-primary), #fdf6ec 42%);
+
+  --blush:        var(--brand-secondary);
+  --blush-deep:   color-mix(in oklab, var(--brand-secondary), #1a0c02 26%);
+  --blush-soft:   color-mix(in oklab, var(--brand-secondary), #fdf6ec 38%);
+
+  --rosewood:     color-mix(in oklab, #3a1c0c 70%, var(--brand-primary));
+  --rosewood-glow:color-mix(in oklab, #3a1c0c 52%, var(--brand-primary));
+  --ink-soft:     color-mix(in oklab, #36230f 66%, var(--brand-primary));
   --error:        #a04444;
 
   --display:  'Fraunces', 'Times New Roman', serif;
@@ -68,9 +77,9 @@ body {
      to the viewport so they breathe with scroll. Plus very faint
      paper tooth. */
   background-image:
-    radial-gradient(ellipse 80% 60% at 12% 0%,  rgba(212, 163, 163, 0.22), transparent 65%),
-    radial-gradient(ellipse 70% 50% at 90% 100%, rgba(122, 139, 110, 0.18), transparent 60%),
-    radial-gradient(ellipse 60% 40% at 50% 50%, rgba(250, 244, 234, 0.4), transparent 70%),
+    radial-gradient(ellipse 80% 60% at 12% 0%,  color-mix(in srgb, var(--brand-secondary) 22%, transparent), transparent 65%),
+    radial-gradient(ellipse 70% 50% at 90% 100%, color-mix(in srgb, var(--brand-primary) 18%, transparent), transparent 60%),
+    radial-gradient(ellipse 60% 40% at 50% 50%, color-mix(in srgb, var(--cream) 40%, transparent), transparent 70%),
     url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='p'><feTurbulence type='fractalNoise' baseFrequency='0.62' numOctaves='1' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.42  0 0 0 0 0.32  0 0 0 0 0.18  0 0 0 0.10 0'/></filter><rect width='200' height='200' filter='url(%23p)'/></svg>");
   background-size: auto, auto, auto, 200px 200px;
   background-attachment: fixed;
@@ -103,7 +112,7 @@ body::after {
   box-shadow:
     0 0 18px rgba(255, 240, 200, 0.7),
     0 0 38px rgba(255, 218, 170, 0.45),
-    0 0 70px rgba(212, 163, 163, 0.25);
+    0 0 70px color-mix(in srgb, var(--brand-secondary) 25%, transparent);
   pointer-events: none;
   z-index: 0;
   opacity: 0;
@@ -233,7 +242,7 @@ body::after {
   animation: garden-rise 1.6s var(--ease-soft) 500ms forwards;
 }
 .bismillah-star { display: none; }
-.blessing { display: none; }     /* Manuscript-only element */
+.blessing, .blessing-translit { display: none; }     /* Manuscript-only element */
 
 /* ── Eyebrow — handwritten script with two leaves ────────────── */
 .eyebrow-label,
@@ -457,7 +466,7 @@ body::after {
     inset 0 0 0 1px var(--blush),
     inset 0 0 0 4px var(--cream-white),
     inset 0 0 0 5px var(--blush),
-    0 8px 22px rgba(107, 58, 50, 0.14);
+    0 8px 22px color-mix(in srgb, var(--rosewood) 14%, transparent);
   padding: 1rem 2.5rem;
 }
 .btn-primary::before {
@@ -479,7 +488,7 @@ body::after {
     inset 0 0 0 1px var(--blush-deep),
     inset 0 0 0 4px var(--cream-white),
     inset 0 0 0 5px var(--blush-deep),
-    0 12px 28px rgba(107, 58, 50, 0.18);
+    0 12px 28px color-mix(in srgb, var(--rosewood) 18%, transparent);
 }
 .btn-primary:hover::before { opacity: 1; }
 .btn-primary:active { transform: translateY(1px); }
@@ -551,8 +560,8 @@ body::after {
   border-radius: 4px;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.6),
-    0 18px 38px rgba(107, 58, 50, 0.10),
-    0 6px 14px rgba(122, 139, 110, 0.06);
+    0 18px 38px color-mix(in srgb, var(--rosewood) 10%, transparent),
+    0 6px 14px color-mix(in srgb, var(--brand-primary) 6%, transparent);
   transform: rotate(-0.3deg);
 }
 
@@ -742,7 +751,7 @@ input[type="file"] { display: none; }
   position: fixed;
   left: 0; right: 0; bottom: 0;
   padding: 0.8rem var(--pad) calc(0.8rem + var(--safe-bottom));
-  background: rgba(250, 244, 234, 0.92);
+  background: color-mix(in srgb, var(--cream) 92%, transparent);
   backdrop-filter: blur(10px);
   border-top: 1px solid var(--blush);
   z-index: 50;
@@ -764,7 +773,7 @@ input[type="file"] { display: none; }
   border-radius: 6px;
   position: relative;
   transform: rotate(-0.6deg);
-  box-shadow: 0 20px 44px rgba(107, 58, 50, 0.12);
+  box-shadow: 0 20px 44px color-mix(in srgb, var(--rosewood) 12%, transparent);
 }
 .ceremony.is-active {
   display: block;
@@ -856,7 +865,7 @@ input[type="file"] { display: none; }
   transform: translateY(-3px);
   rotate: 0deg;
   border-color: var(--blush-deep);
-  box-shadow: 0 12px 26px rgba(107, 58, 50, 0.14);
+  box-shadow: 0 12px 26px color-mix(in srgb, var(--rosewood) 14%, transparent);
   z-index: 2;
 }
 .gallery a img, .gallery a video {
@@ -895,7 +904,7 @@ input[type="file"] { display: none; }
 /* ── Lightbox ───────────────────────────────────────────────── */
 .lightbox {
   position: fixed; inset: 0;
-  background: rgba(107, 58, 50, 0.94);
+  background: color-mix(in srgb, var(--rosewood) 94%, transparent);
   backdrop-filter: blur(16px);
   display: none;
   align-items: center;
@@ -945,7 +954,7 @@ input[type="file"] { display: none; }
   outline-offset: 5px;
   text-align: center;
   border-radius: 6px;
-  box-shadow: 0 28px 72px rgba(107, 58, 50, 0.14), 0 6px 18px rgba(122, 139, 110, 0.06);
+  box-shadow: 0 28px 72px color-mix(in srgb, var(--rosewood) 14%, transparent), 0 6px 18px color-mix(in srgb, var(--brand-primary) 6%, transparent);
   transform: rotate(-0.4deg);
 }
 .qr-card::before, .qr-card::after { display: none; }
@@ -1179,7 +1188,7 @@ input[type="file"] { display: none; }
 }
 .theme-swatch:hover {
   transform: translateY(-2px) rotate(-1deg);
-  box-shadow: 0 8px 18px rgba(107, 58, 50, 0.14);
+  box-shadow: 0 8px 18px color-mix(in srgb, var(--rosewood) 14%, transparent);
 }
 .theme-swatch.is-active {
   border-color: var(--rosewood);
@@ -1195,7 +1204,7 @@ input[type="file"] { display: none; }
   font-weight: 600;
   font-size: 0.75rem;
   color: var(--cream-white);
-  background: rgba(107, 58, 50, 0.82);
+  background: color-mix(in srgb, var(--rosewood) 82%, transparent);
   padding: 1px 6px 2px;
   border-radius: 999px;
   z-index: 2;
@@ -1205,7 +1214,7 @@ input[type="file"] { display: none; }
   display: block;
   width: 100%; height: 100%;
   border-radius: 3px;
-  background: linear-gradient(180deg, var(--a, #faf4ea) 0% 60%, var(--b, #7a8b6e) 60% 100%);
+  background: linear-gradient(180deg, var(--a, #fff3e6) 0% 60%, var(--b, #bf661f) 60% 100%);
 }
 .theme-picker-name {
   font-family: var(--script);
@@ -1300,3 +1309,78 @@ input[type="file"] { display: none; }
     transform: none !important;
   }
 }
+/* ════════════════════════════════════════════════════════════════
+   Palette picker — recolours every universe live from two source
+   colours. Theme-agnostic: styled entirely from --brand-* and
+   currentColor, so this same block adapts to each universe. ────── */
+.palette-picker { margin-top: 1.9rem; text-align: center; }
+.palette-row {
+  display: inline-flex;
+  gap: 1.5rem;
+  justify-content: center;
+  margin-bottom: 1.1rem;
+}
+.palette-control {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  position: relative;
+}
+.palette-dot {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, currentColor 28%, transparent);
+  box-shadow: 0 3px 12px color-mix(in srgb, var(--brand-primary) 35%, transparent);
+  transition: transform 180ms var(--ease, ease);
+}
+.palette-control:hover .palette-dot { transform: scale(1.08); }
+#primaryDot   { background: var(--brand-primary); }
+#secondaryDot { background: var(--brand-secondary); }
+.palette-name {
+  font-family: var(--body);
+  font-size: 0.5rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  opacity: 0.65;
+}
+.palette-control input[type="color"] {
+  position: absolute;
+  inset: 0;
+  width: 100%; height: 100%;
+  margin: 0; padding: 0; border: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.palette-presets {
+  display: inline-flex;
+  gap: 0.6rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  max-width: 260px;
+  margin: 0 auto 1rem;
+}
+.palette-preset {
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, currentColor 22%, transparent);
+  cursor: pointer;
+  padding: 0;
+  background: linear-gradient(135deg, var(--pp) 0 50%, var(--ps) 50% 100%);
+  transition: transform 160ms var(--ease, ease);
+}
+.palette-preset:hover { transform: translateY(-2px) scale(1.06); }
+.palette-reset {
+  font-family: var(--body);
+  font-size: 0.5rem;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  background: none;
+  border: 0;
+  color: inherit;
+  opacity: 0.5;
+  cursor: pointer;
+  padding: 0.3rem 0.5rem;
+}
+.palette-reset:hover { opacity: 0.85; }

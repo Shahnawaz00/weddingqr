@@ -17,14 +17,24 @@
 }
 
 :root {
-  --ink:           #0c0a08;
-  --bone:          #e8dfc8;
-  --bone-mute:     #9e9580;
-  --bone-deep:     #c2b89c;
-  --ember:         #c25a2a;
-  --ember-glow:    #d8703e;
-  --ember-soft:    rgba(194, 90, 42, 0.18);
-  --error:         #e57b6a;
+  /* ── Brand tokens — the palette picker drives these two. Everything
+        below derives from them via color-mix, so one swap recolours
+        the whole universe (and the other two themes too). ───────── */
+  --brand-primary:   #e0701f;
+  --brand-secondary: #ffb24d;
+
+  /* Light cinema — a warm ivory film-still ground with near-black ink
+     type and an ember accent. --ink is the page SURFACE (light); the
+     --bone family is the FOREGROUND (dark). Every fill/text pairing
+     uses one of each, so they invert together and contrast holds. */
+  --ink:           color-mix(in oklab, #f4ebdb 93%, var(--brand-primary));
+  --bone:          color-mix(in oklab, #1a120a 82%, var(--brand-primary));
+  --bone-mute:     color-mix(in oklab, #1a120a 44%, var(--brand-primary));
+  --bone-deep:     color-mix(in oklab, #1a120a 66%, var(--brand-primary));
+  --ember:         var(--brand-primary);
+  --ember-glow:    var(--brand-secondary);
+  --ember-soft:    color-mix(in srgb, var(--brand-primary) 18%, transparent);
+  --error:         #c0432e;
 
   --display:  'Fraunces', 'Times New Roman', serif;
   --body:     'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
@@ -84,9 +94,9 @@ body::before {
   inset: 0;
   pointer-events: none;
   z-index: 0;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='320' height='320'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 0.96  0 0 0 0 0.86  0 0 0 0.07 0'/></filter><rect width='320' height='320' filter='url(%23g)'/></svg>");
-  opacity: 0.55;
-  mix-blend-mode: screen;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='320' height='320'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.12  0 0 0 0 0.09  0 0 0 0 0.05  0 0 0 0.05 0'/></filter><rect width='320' height='320' filter='url(%23g)'/></svg>");
+  opacity: 0.5;
+  mix-blend-mode: multiply;
 }
 
 /* Breathing ember glow — two soft radial pools that slowly pulse
@@ -101,8 +111,8 @@ body::after {
   pointer-events: none;
   z-index: 0;
   background-image:
-    radial-gradient(60vw 50vw at 18% 22%, rgba(194, 90, 42, 0.20), transparent 65%),
-    radial-gradient(55vw 45vw at 82% 80%, rgba(216, 112, 62, 0.16), transparent 60%);
+    radial-gradient(60vw 50vw at 18% 22%, color-mix(in srgb, var(--brand-primary) 20%, transparent), transparent 65%),
+    radial-gradient(55vw 45vw at 82% 80%, color-mix(in srgb, var(--brand-secondary) 16%, transparent), transparent 60%);
   animation: ember-breathe 14s ease-in-out infinite;
   will-change: opacity;
 }
@@ -120,7 +130,7 @@ body::after {
   left: 0; right: 0;
   /* Mobile: 7vh per bar. Desktop widens to 12vh. */
   height: 7vh;
-  background: var(--ink);
+  background: var(--bone);
   border-color: var(--ember);
   z-index: 100;
   pointer-events: none;
@@ -228,7 +238,7 @@ input, button, textarea { font: inherit; color: inherit; background: transparent
 /* The little bismillah-star element is unused in cinema (we use
    the rules directly). Hide it. */
 .bismillah-star { display: none; }
-.blessing { display: none; }     /* the Arabic wedding blessing is a Manuscript-only element */
+.blessing, .blessing-translit { display: none; }     /* the Arabic wedding blessing is a Manuscript-only element */
 
 /* ── Eyebrow ────────────────────────────────────────────────── */
 .eyebrow-label,
@@ -262,7 +272,7 @@ input, button, textarea { font: inherit; color: inherit; background: transparent
   /* Dominate the viewport — names are the visual hero. Mobile gets
      22vw (≈85px on 390px); desktop caps at 12rem. */
   font-size: clamp(4.5rem, 22vw, 12rem);
-  text-shadow: 0 0 32px rgba(232, 223, 200, 0.04);
+  text-shadow: 0 0 32px color-mix(in srgb, var(--bone) 4%, transparent);
   overflow-wrap: anywhere;
 }
 .hero h1 .name {
@@ -471,8 +481,8 @@ input, button, textarea { font: inherit; color: inherit; background: transparent
 /* ── Upload card — slab of dim bone on ink ──────────────────── */
 .card {
   position: relative;
-  background: rgba(232, 223, 200, 0.04);
-  border: 0.5px solid rgba(232, 223, 200, 0.18);
+  background: color-mix(in srgb, var(--bone) 4%, transparent);
+  border: 0.5px solid color-mix(in srgb, var(--bone) 18%, transparent);
   padding: 2rem 1.25rem;
   margin: 1rem 0;
   border-radius: 0;
@@ -493,7 +503,7 @@ input, button, textarea { font: inherit; color: inherit; background: transparent
   display: block;
   position: relative;
   background: transparent;
-  border: 1px dashed rgba(232, 223, 200, 0.3);
+  border: 1px dashed color-mix(in srgb, var(--bone) 30%, transparent);
   padding: 2.5rem 1rem;
   text-align: center;
   cursor: pointer;
@@ -502,7 +512,7 @@ input, button, textarea { font: inherit; color: inherit; background: transparent
 }
 .dropzone:hover, .dropzone.is-dragover {
   border-color: var(--ember);
-  background: rgba(194, 90, 42, 0.04);
+  background: color-mix(in srgb, var(--brand-primary) 4%, transparent);
 }
 .dropzone img.dz-art {
   width: 56px;
@@ -562,7 +572,7 @@ input[type="file"] { display: none; }
   color: var(--bone);
   background: transparent;
   border: none;
-  border-bottom: 1px solid rgba(232, 223, 200, 0.3);
+  border-bottom: 1px solid color-mix(in srgb, var(--bone) 30%, transparent);
   border-radius: 0;
   outline: none;
   transition: border-color 200ms var(--ease);
@@ -579,7 +589,7 @@ input[type="file"] { display: none; }
   gap: 0.5rem;
   min-height: 44px;
   padding: 0.6rem 1.1rem;
-  border: 0.5px solid rgba(232, 223, 200, 0.3);
+  border: 0.5px solid color-mix(in srgb, var(--bone) 30%, transparent);
   background: transparent;
   font-family: var(--body);
   font-size: 0.7rem;
@@ -614,8 +624,8 @@ input[type="file"] { display: none; }
   position: relative;
   aspect-ratio: 1;
   overflow: hidden;
-  background: rgba(232, 223, 200, 0.06);
-  border: 0.5px solid rgba(232, 223, 200, 0.2);
+  background: color-mix(in srgb, var(--bone) 6%, transparent);
+  border: 0.5px solid color-mix(in srgb, var(--bone) 20%, transparent);
   transition: opacity 280ms var(--ease), transform 280ms var(--ease);
 }
 @starting-style { .thumb { opacity: 0; transform: scale(0.96); } }
@@ -649,7 +659,7 @@ input[type="file"] { display: none; }
 .progress {
   margin-top: 1rem;
   height: 2px;
-  background: rgba(232, 223, 200, 0.15);
+  background: color-mix(in srgb, var(--bone) 15%, transparent);
   overflow: hidden;
   display: none;
   position: relative;
@@ -670,7 +680,7 @@ input[type="file"] { display: none; }
   position: fixed;
   left: 0; right: 0; bottom: 0;
   padding: 0.8rem var(--pad) calc(0.8rem + var(--safe-bottom));
-  background: rgba(12, 10, 8, 0.92);
+  background: color-mix(in srgb, var(--ink) 92%, transparent);
   backdrop-filter: blur(12px);
   border-top: 0.5px solid var(--ember-soft);
   z-index: 50;
@@ -726,7 +736,7 @@ input[type="file"] { display: none; }
   text-transform: uppercase;
   min-height: 44px;
   padding: 0.65rem 1.15rem;
-  border: 0.5px solid rgba(232, 223, 200, 0.3);
+  border: 0.5px solid color-mix(in srgb, var(--bone) 30%, transparent);
   background: transparent;
   color: var(--bone);
   cursor: pointer;
@@ -757,8 +767,8 @@ input[type="file"] { display: none; }
   grid-column: span 2;
   grid-row: span 2;
   overflow: hidden;
-  background: rgba(232, 223, 200, 0.06);
-  border: 0.5px solid rgba(232, 223, 200, 0.18);
+  background: color-mix(in srgb, var(--bone) 6%, transparent);
+  border: 0.5px solid color-mix(in srgb, var(--bone) 18%, transparent);
   transition: transform 280ms var(--ease), border-color 280ms var(--ease);
   position: relative;
 }
@@ -796,7 +806,7 @@ input[type="file"] { display: none; }
 .gallery .skeleton {
   display: block;
   aspect-ratio: 1;
-  background: rgba(232, 223, 200, 0.05);
+  background: color-mix(in srgb, var(--bone) 5%, transparent);
   animation: gold-pulse 1.4s ease-in-out infinite alternate;
 }
 @media (max-width: 639px) {
@@ -810,7 +820,7 @@ input[type="file"] { display: none; }
 /* ── Lightbox ───────────────────────────────────────────────── */
 .lightbox {
   position: fixed; inset: 0;
-  background: rgba(12, 10, 8, 0.96);
+  background: color-mix(in srgb, var(--ink) 96%, transparent);
   backdrop-filter: blur(20px);
   display: none;
   align-items: center;
@@ -997,7 +1007,7 @@ input[type="file"] { display: none; }
   text-align: center;
   margin-top: 5rem;
   padding-top: 3rem;
-  border-top: 0.5px solid rgba(232, 223, 200, 0.12);
+  border-top: 0.5px solid color-mix(in srgb, var(--bone) 12%, transparent);
   position: relative;
 }
 .foot .seal {
@@ -1074,7 +1084,7 @@ input[type="file"] { display: none; }
 .theme-swatch {
   width: 56px;
   height: 80px;
-  border: 0.5px solid rgba(232, 223, 200, 0.25);
+  border: 0.5px solid color-mix(in srgb, var(--bone) 25%, transparent);
   background: transparent;
   cursor: pointer;
   -webkit-appearance: none;
@@ -1100,11 +1110,11 @@ input[type="file"] { display: none; }
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--bone);
-  background: rgba(12, 10, 8, 0.7);
+  background: color-mix(in srgb, var(--ink) 70%, transparent);
   padding: 2px 5px;
   z-index: 2;
 }
-.theme-swatch.is-disabled:hover { transform: none; border-color: rgba(232, 223, 200, 0.25); }
+.theme-swatch.is-disabled:hover { transform: none; border-color: color-mix(in srgb, var(--bone) 25%, transparent); }
 .theme-swatch.is-active::after {
   content: '';
   position: absolute;
@@ -1115,7 +1125,7 @@ input[type="file"] { display: none; }
 .swatch-inner {
   display: block;
   width: 100%; height: 100%;
-  background: linear-gradient(180deg, var(--a, #0c0a08) 0% 60%, var(--b, #c25a2a) 60% 100%);
+  background: linear-gradient(180deg, var(--a, #f3e3ce) 0% 60%, var(--b, #e0701f) 60% 100%);
   position: relative;
 }
 .theme-picker-name {
@@ -1212,3 +1222,78 @@ input[type="file"] { display: none; }
     clip-path: none !important;
   }
 }
+/* ════════════════════════════════════════════════════════════════
+   Palette picker — recolours every universe live from two source
+   colours. Theme-agnostic: styled entirely from --brand-* and
+   currentColor, so this same block adapts to each universe. ────── */
+.palette-picker { margin-top: 1.9rem; text-align: center; }
+.palette-row {
+  display: inline-flex;
+  gap: 1.5rem;
+  justify-content: center;
+  margin-bottom: 1.1rem;
+}
+.palette-control {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  position: relative;
+}
+.palette-dot {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, currentColor 28%, transparent);
+  box-shadow: 0 3px 12px color-mix(in srgb, var(--brand-primary) 35%, transparent);
+  transition: transform 180ms var(--ease, ease);
+}
+.palette-control:hover .palette-dot { transform: scale(1.08); }
+#primaryDot   { background: var(--brand-primary); }
+#secondaryDot { background: var(--brand-secondary); }
+.palette-name {
+  font-family: var(--body);
+  font-size: 0.5rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  opacity: 0.65;
+}
+.palette-control input[type="color"] {
+  position: absolute;
+  inset: 0;
+  width: 100%; height: 100%;
+  margin: 0; padding: 0; border: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.palette-presets {
+  display: inline-flex;
+  gap: 0.6rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  max-width: 260px;
+  margin: 0 auto 1rem;
+}
+.palette-preset {
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, currentColor 22%, transparent);
+  cursor: pointer;
+  padding: 0;
+  background: linear-gradient(135deg, var(--pp) 0 50%, var(--ps) 50% 100%);
+  transition: transform 160ms var(--ease, ease);
+}
+.palette-preset:hover { transform: translateY(-2px) scale(1.06); }
+.palette-reset {
+  font-family: var(--body);
+  font-size: 0.5rem;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  background: none;
+  border: 0;
+  color: inherit;
+  opacity: 0.5;
+  cursor: pointer;
+  padding: 0.3rem 0.5rem;
+}
+.palette-reset:hover { opacity: 0.85; }
