@@ -5,7 +5,7 @@
 window.WEDDING_CONFIG = {
   brideName: 'Izzati',
   groomName: 'Danial',
-  date: '12 December 2026',
+  date: '27 March 2027',
   venue: 'Melbourne',
   hashtag: '#IzzyAndDanial',
 
@@ -32,7 +32,7 @@ window.WEDDING_CONFIG = {
   //  an exact spelling (e.g. Bahasa Malaysia: "1 Rabiulawal 1448"),
   //  set it here and it'll be used verbatim.
   // ────────────────────────────────────────────────────────────
-  hijriDate: '3 Rajab 1448',  // e.g. '1 Rabiulawal 1448' to override auto-compute
+  hijriDate: '19 Shawwal 1448', // e.g. '1 Rabiulawal 1448' to override auto-compute
 
   // ────────────────────────────────────────────────────────────
   //  Events / albums
